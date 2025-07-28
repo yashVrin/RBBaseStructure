@@ -1,0 +1,35 @@
+import React from 'react';
+import { TouchableOpacity, Text, StyleSheet } from 'react-native';
+import Colors from '../assets/Colors';
+
+const BaseButton = ({ title, onPress, disabled }) => {
+  return (
+    <TouchableOpacity
+      style={[styles.button, disabled && styles.buttonDisabled]}
+      onPress={onPress}
+      disabled={disabled}
+    >
+      <Text style={styles.text}>{title}</Text>
+    </TouchableOpacity>
+  );
+};
+
+const styles = StyleSheet.create({
+  button: {
+    height: 50,
+    backgroundColor: Colors.PRIMARY,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  buttonDisabled: {
+    backgroundColor: Colors.PRIMARY_LIGHT,
+  },
+  text: {
+    color: Colors.WHITE,
+    fontSize: 18,
+  },
+});
+
+export default BaseButton;
