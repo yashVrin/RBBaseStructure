@@ -1,12 +1,12 @@
 import { StyleSheet, Text, View } from 'react-native';
 import React from 'react';
 import { useNavigation } from '@react-navigation/native';
-import Fonts from '../../../assets/Fonts';
-import Colors from '../../../assets/Colors';
-import ScreenContainer from '../../../components/ScreenContainer';
-import { wp } from '../../../utils/responsive';
+import Fonts from '@assets/Fonts.js';
+import Colors from '@assets/Colors.js';
+import ScreenContainer from '@components/ScreenContainer.js';
+import { wp } from '@utils/responsive.js';
 import { useDispatch, useSelector } from 'react-redux';
-import { setLoggedOut } from '../../../store/slices/authSlice';
+import { setLoggedOut } from '@store/slices/authSlice.js';
 
 const ProfileScreen = () => {
   const navigation = useNavigation();

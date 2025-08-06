@@ -6,7 +6,7 @@ import HomeScreen from '../screens/main/HomeScreen/HomeScreen';
 import Search from '../screens/main/Search/Search';
 import ProfileScreen from '../screens/main/ProfileScreen/ProfileScreen';
 import SettingsScreen from '../screens/main/SettingsScreen/SettingsScreen';
-import Colors from '../assets/Colors';
+import Colors from '@assets/Colors.js';
 
 const Tab = createBottomTabNavigator();
 

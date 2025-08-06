@@ -1,7 +1,7 @@
 import { StyleSheet, View } from 'react-native';
 import React from 'react';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import Colors from '../assets/Colors';
+import Colors from '@assets/Colors.js';
 
 export default function ScreenContainer({ children, padding, width }) {
   return (

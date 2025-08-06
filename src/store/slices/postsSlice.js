@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import PostModel from '../../types/common/models/PostModel';
-import axiosClient from '../../services/api';
-import { LoggerService } from '../../services/LoggerService';
+import PostModel from '@types/common/models/PostModel.js';
+import axiosClient from '@services/api.js';
+import { LoggerService } from '@services/LoggerService.js';
 
 export const fetchPosts = createAsyncThunk(
   'posts/fetchPosts',

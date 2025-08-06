@@ -1,6 +1,6 @@
 import React from 'react';
 import { TextInput, StyleSheet, View, Text } from 'react-native';
-import Colors from '../assets/Colors';
+import Colors from '@assets/Colors.js';
 
 const BaseTextInput = ({
   placeholder,

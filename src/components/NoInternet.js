@@ -12,10 +12,9 @@ import {
 } from 'react-native';
 import React, { useState } from 'react';
 import Modal from 'react-native-modal';
-import Colors from '../assets/Colors';
-import { wp } from '../utils/responsive';
-import Fonts from '../assets/Fonts';
-import { Images } from '../assets/Images';
+import Colors from '@assets/Colors.js';
+import Fonts from '@assets/Fonts.js';
+import { Images } from '@assets/Images.js';
 
 export default function NoInternet({ show }) {
   const [loader, showLoader] = useState(false);

@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { View, TextInput, StyleSheet } from 'react-native';
-import Colors from '../assets/Colors';
+import Colors from '@assets/Colors.js';
 
 const OtpInput = ({ code, setCode, maxLength = 6 }) => {
   const inputsRef = useRef([]);

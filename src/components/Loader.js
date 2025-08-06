@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { DotIndicator } from 'react-native-indicators';
-import Colors from '../assets/Colors';
+import Colors from '@assets/Colors.js';
 /**
  * Loader Custom Component is used for writing Text in Whole app.
  */

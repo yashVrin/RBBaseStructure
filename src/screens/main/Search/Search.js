@@ -7,8 +7,8 @@ import {
   TouchableOpacity,
   Alert,
 } from 'react-native';
-import PermissionHandler from '../../../utils/PermissionHandler';
-import ScreenContainer from '../../../components/ScreenContainer';
+import PermissionHandler from '@utils/PermissionHandler.js';
+import ScreenContainer from '@components/ScreenContainer.js';
 
 const PERMISSIONS = [
   { key: 'camera', label: 'Camera Permission' },

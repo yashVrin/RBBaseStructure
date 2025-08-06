@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axiosClient from '../../services/api';
-import { LoggerService } from '../../services/LoggerService';
-import PhotosModel from '../../types/common/models/PhotosModel';
+import axiosClient from '@services/api.js';
+import { LoggerService } from '@services/LoggerService.js';
+import PhotosModel from '@types/common/models/PhotosModel.js';
 
 export const fetchPhotos = createAsyncThunk(
   'users/fetchPhotos',

@@ -1,6 +1,6 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
-import Colors from '../assets/Colors';
+import Colors from '@assets/Colors.js';
 
 const BaseButton = ({ title, onPress, disabled }) => {
   return (

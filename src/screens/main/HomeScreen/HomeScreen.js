@@ -8,18 +8,12 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchPosts } from '../../../store/slices/postsSlice';
-import Colors from '../../../assets/Colors';
-import ScreenContainer from '../../../components/ScreenContainer';
-import { Loader } from '../../../components/Loader';
-import {
-  hp,
-  moderateScale,
-  normalizeFont,
-  wp,
-} from '../../../utils/responsive';
-import useNetworkStatus from '../../../hooks/useNetworkStatus';
-import NoInternet from '../../../components/NoInternet';
+import { fetchPosts } from '@store/slices/postsSlice.js';
+import ScreenContainer from '@components/ScreenContainer.js';
+import { Loader } from '@components/Loader.js';
+import { hp, moderateScale, normalizeFont, wp } from '@utils/responsive.js';
+import useNetworkStatus from '@hooks/useNetworkStatus.js';
+import NoInternet from '@components/NoInternet.js';
 
 const HomeScreen = () => {
   const dispatch = useDispatch();

@@ -1,3 +1,3 @@
 export const Images = {
-  WIFI: require('../assets/AppImage/wifi.png'),
+  WIFI: require('@assets/AppImage/wifi.png'),
 };

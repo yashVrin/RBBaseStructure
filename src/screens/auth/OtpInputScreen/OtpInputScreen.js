@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Alert, TouchableOpacity } from 'react-native';
-import ScreenContainer from '../../../components/ScreenContainer';
-import OtpInput from '../../../components/OtpInput';
-import BaseButton from '../../../components/BaseButton';
-import Colors from '../../../assets/Colors';
+import ScreenContainer from '@components/ScreenContainer.js';
+import OtpInput from '@components/OtpInput.js';
+import BaseButton from '@components/BaseButton.js';
+import Colors from '@assets/Colors.js';
 import {
   CommonActions,
   useNavigation,
   useRoute,
 } from '@react-navigation/native';
-import { setLoggedIn } from '../../../store/slices/authSlice';
+import { setLoggedIn } from '@store/slices/authSlice.js';
 import { useDispatch } from 'react-redux';
 
 const OtpInputScreen = () => {

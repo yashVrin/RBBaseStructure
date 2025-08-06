@@ -7,7 +7,7 @@ import {
   Animated,
 } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
-import { LoggerService } from '../../../services/LoggerService';
+import { LoggerService } from '@services/LoggerService.js';
 
 export default function LoggerFile() {
   const [logs, setLogs] = useState([]);

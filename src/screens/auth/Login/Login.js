@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, Text, Alert } from 'react-native';
-import Colors from '../../../assets/Colors';
-import BaseTextInput from '../../../components/BaseTextInput';
-import BaseButton from '../../../components/BaseButton';
-import ScreenContainer from '../../../components/ScreenContainer';
+import Colors from '@assets/Colors.js';
+import BaseTextInput from '@components/BaseTextInput.js';
+import BaseButton from '@components/BaseButton.js';
+import ScreenContainer from '@components/ScreenContainer.js';
 import { useNavigation } from '@react-navigation/native';
 
 const validatePhoneNumber = phone => {
