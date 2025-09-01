@@ -60,30 +60,28 @@ const SplashScreen: React.FC = () => {
 
   const requestPermissionsNotifications = async (): Promise<void> => {
     if (Platform.OS === 'android' && Platform.Version >= 33) {
+      const notifPermission = PERMISSIONS.ANDROID.POST_NOTIFICATIONS;
+  
+      if (!notifPermission) {
+        console.log('POST_NOTIFICATIONS not available in this RN Permissions version');
+        return;
+      }
+  
       try {
-        const result = await request(PERMISSIONS.ANDROID.POST_NOTIFICATIONS);
+        const result = await request(notifPermission);
         if (result === RESULTS.GRANTED) {
-          // Permission granted
+          console.log('Notification permission granted ✅');
         } else {
-          // Permission denied or blocked
+          console.log('Notification permission denied ❌');
         }
       } catch (error) {
-        console.error(error);
+        console.log('Notification permission error:', error);
       }
     } else {
-      // Android < 13 or fallback
-      try {
-        const result = await request(PERMISSIONS.ANDROID.POST_NOTIFICATIONS);
-        if (result === RESULTS.GRANTED) {
-          // Permission granted
-        } else {
-          // Permission denied or blocked
-        }
-      } catch (error) {
-        console.error(error);
-      }
+      console.log('Notification permission not required on Android < 13');
     }
   };
+  
 
   useEffect(() => {
     (async () => {

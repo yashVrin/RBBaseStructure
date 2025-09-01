@@ -84,7 +84,7 @@ const NoInternet: React.FC<NoInternetProps> = ({ show }) => {
       isVisible={show}
       style={{ margin: 0 }}
       coverScreen
-      backdropColor={Colors.WHITE}
+      backdropOpacity={1}
       deviceHeight={Dimensions.get('screen').height}
       deviceWidth={Dimensions.get('screen').width}
       onBackButtonPress={_backAction}

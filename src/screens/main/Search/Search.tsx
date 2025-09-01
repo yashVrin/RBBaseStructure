@@ -11,7 +11,7 @@ import {
 import PermissionHandler from '@utils/PermissionHandler';
 import ScreenContainer from '@components/ScreenContainer';
 
-type PermissionKey = 'camera' | 'location' | 'storage' | 'notifications';
+type PermissionKey = 'camera' | 'location' | 'storage';
 
 interface PermissionItem {
   key: PermissionKey;
@@ -22,7 +22,6 @@ const PERMISSIONS: PermissionItem[] = [
   { key: 'camera', label: 'Camera Permission' },
   { key: 'location', label: 'Location Permission' },
   { key: 'storage', label: 'Storage Permission' },
-  { key: 'notifications', label: 'Notifications Permission' },
 ];
 
 const Search: React.FC = () => {
@@ -38,9 +37,6 @@ const Search: React.FC = () => {
         break;
       case 'storage':
         result = await PermissionHandler.requestStoragePermission();
-        break;
-      case 'notifications':
-        result = await PermissionHandler.requestNotificationsPermission();
         break;
       default:
         return;

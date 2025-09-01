@@ -1,38 +1,40 @@
 import React from 'react';
-import { ViewStyle } from 'react-native';
-import { DotIndicator, DotIndicatorProps } from 'react-native-indicators';
+import { ActivityIndicator, View, ViewStyle, StyleSheet } from 'react-native';
 import Colors from '@assets/Colors';
 
-type LoaderProps = Partial<DotIndicatorProps> & {
+// Use a native ActivityIndicator to avoid library prop forwarding issues
+// that may pass `color` to a native View and crash on iOS.
+
+type LoaderProps = {
   style?: ViewStyle | ViewStyle[];
+  size?: number | 'small' | 'large';
+  color?: string;
 };
 
-/**
- * Loader Custom Component is used for showing loading indicators in the app.
- */
-export const Loader: React.FC<LoaderProps> = props => {
-  const { style } = props;
-
+export const Loader: React.FC<LoaderProps> = ({
+  style,
+  size = 'large',
+  color = Colors.PRIMARY,
+}) => {
   return (
-    <DotIndicator
-      {...props}
-      color={Colors.PRIMARY}
-      count={3}
-      size={13}
-      animating
-      style={[
-        {
-          position: 'absolute',
-          alignItems: 'center',
-          justifyContent: 'center',
-          top: 0,
-          bottom: 0,
-          left: 0,
-          right: 0,
-          zIndex: 2,
-        },
-        ...(Array.isArray(style) ? style : [style]),
-      ]}
-    />
+    <View style={[
+      styles.overlay,
+      ...(Array.isArray(style) ? style : [style]),
+    ]}>
+      <ActivityIndicator size={size} color={color} />
+    </View>
   );
 };
+
+const styles = StyleSheet.create({
+  overlay: {
+    position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'center',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    zIndex: 2,
+  },
+});
