@@ -10,6 +10,7 @@ import BottomTabs from './BottomTabs';
 import SplashScreen from '../screens/auth/SplashScreen/SplashScreen';
 import LoggerFile from '../screens/main/LoggerFile/LoggerFile';
 import OtpInputScreen from '../screens/auth/OtpInputScreen/OtpInputScreen';
+import LanguageScreen from '../screens/main/Language/LanguageScreen';
 
 // Define types for stack params if needed (you can add params if your screens use them)
 export type RootStackParamList = {
@@ -19,6 +20,7 @@ export type RootStackParamList = {
   Search: undefined;
   OtpInputScreen: undefined;
   BottomTabs: undefined;
+  Language: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -47,6 +49,7 @@ const AppNavigator: React.FC = () => (
         options={{ headerShown: false }}
       />
       <Stack.Screen name="BottomTabs" component={BottomTabs} />
+      <Stack.Screen name="Language" component={LanguageScreen} options={{ headerShown: true, title: 'Language' }} />
     </Stack.Navigator>
   </NavigationContainer>
 );

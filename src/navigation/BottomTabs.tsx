@@ -6,6 +6,7 @@ import Search from '../screens/main/Search/Search';
 import ProfileScreen from '../screens/main/ProfileScreen/ProfileScreen';
 import SettingsScreen from '../screens/main/SettingsScreen/SettingsScreen';
 import Colors from '@assets/Colors';
+import { useI18n } from '../i18n/i18n';
 
 // Define param list for Bottom Tabs (adjust params if your screens accept any)
 export type BottomTabParamList = {
@@ -18,6 +19,7 @@ export type BottomTabParamList = {
 const Tab = createBottomTabNavigator<BottomTabParamList>();
 
 const BottomTabs: React.FC = () => {
+  const { t } = useI18n();
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -48,10 +50,10 @@ const BottomTabs: React.FC = () => {
         },
       })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Search" component={Search} />
-      <Tab.Screen name="Profile" component={ProfileScreen} />
-      <Tab.Screen name="Settings" component={SettingsScreen} />
+      <Tab.Screen name="Home" component={HomeScreen} options={{ title: t('home') }} />
+      <Tab.Screen name="Search" component={Search} options={{ title: t('search') }} />
+      <Tab.Screen name="Profile" component={ProfileScreen} options={{ title: t('profile') }} />
+      <Tab.Screen name="Settings" component={SettingsScreen} options={{ title: t('settings') }} />
     </Tab.Navigator>
   );
 };

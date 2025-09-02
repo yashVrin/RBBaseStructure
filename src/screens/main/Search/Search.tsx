@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import PermissionHandler from '@utils/PermissionHandler';
 import ScreenContainer from '@components/ScreenContainer';
+import { useI18n } from '../../../i18n/i18n';
 
 type PermissionKey = 'camera' | 'location' | 'storage';
 
@@ -18,13 +19,15 @@ interface PermissionItem {
   label: string;
 }
 
-const PERMISSIONS: PermissionItem[] = [
-  { key: 'camera', label: 'Camera Permission' },
-  { key: 'location', label: 'Location Permission' },
-  { key: 'storage', label: 'Storage Permission' },
-];
-
 const Search: React.FC = () => {
+  const { t } = useI18n();
+
+  const PERMISSIONS: PermissionItem[] = [
+    { key: 'camera', label: t('cameraPermission') },
+    { key: 'location', label: t('locationPermission') },
+    { key: 'storage', label: t('storagePermission') },
+  ];
+
   const handlePermissionRequest = async (key: PermissionKey) => {
     let result: { message?: string } | undefined;
 
@@ -42,10 +45,13 @@ const Search: React.FC = () => {
         return;
     }
 
-    Alert.alert(
-      `${key.charAt(0).toUpperCase() + key.slice(1)} Permission`,
-      result?.message || 'Unknown result',
-    );
+    const titleMap: Record<PermissionKey, string> = {
+      camera: t('cameraPermission'),
+      location: t('locationPermission'),
+      storage: t('storagePermission'),
+    };
+
+    Alert.alert(titleMap[key], result?.message || t('unknownResult'));
   };
 
   const renderItem: ListRenderItem<PermissionItem> = ({ item }) => (
