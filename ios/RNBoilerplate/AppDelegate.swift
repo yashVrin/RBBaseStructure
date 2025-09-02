@@ -6,17 +6,23 @@ import Firebase
 @UIApplicationMain
 class AppDelegate: RCTAppDelegate {
   // Where to load the JS bundle from
-  override func bundleURL() -> URL? {
+ override func sourceURL(for bridge: RCTBridge!) -> URL! {
 #if DEBUG
-    return RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
+   return RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index", fallbackExtension: nil)
 #else
     return Bundle.main.url(forResource: "main", withExtension: "jsbundle")
 #endif
-  }
+}
 
   // Configure RN root component and props during launch
   override func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
-    FirebaseApp.configure()
+    if FirebaseApp.app() == nil {
+      if Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil {
+        FirebaseApp.configure()
+      } else {
+        NSLog("GoogleService-Info.plist missing - skipping Firebase configuration")
+      }
+    }
 
     // Set module and props before calling super
     self.moduleName = "RNBoilerplate" // must match app.json name
