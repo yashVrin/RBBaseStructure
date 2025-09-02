@@ -1395,9 +1395,9 @@ PODS:
     - React-jsiexecutor
     - React-RCTFBReactNativeSpec
     - ReactCommon/turbomodule/core
-  - react-native-config (1.5.1):
-    - react-native-config/App (= 1.5.1)
-  - react-native-config/App (1.5.1):
+  - react-native-config (1.5.5):
+    - react-native-config/App (= 1.5.5)
+  - react-native-config/App (1.5.5):
     - React-Core
   - react-native-image-picker (8.2.1):
     - DoubleConversion
@@ -2277,7 +2277,7 @@ SPEC CHECKSUMS:
   React-logger: 795cd5055782db394f187f9db0477d4b25b44291
   React-Mapbuffer: 0df2a235bd0182f5cbed6c5f095e66deca12e335
   React-microtasksnativemodule: b31e56a980634f383221bfefd5111d04c14c110b
-  react-native-config: 86038147314e2e6d10ea9972022aa171e6b1d4d8
+  react-native-config: 3367df9c1f25bb96197007ec531c7087ed4554c3
   react-native-image-picker: 3a03f96b11ef2b727d3d58a7ed009900b0a56a52
   react-native-netinfo: f0a9899081c185db1de5bb2fdc1c88c202a059ac
   react-native-safe-area-context: 98b67a0b5d0bfc2bf5d465e1fe85d7d2f2ee318f
@@ -2327,4 +2327,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: c78218ca524c70baf96140232c33a7cf4a502089
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.16.2
