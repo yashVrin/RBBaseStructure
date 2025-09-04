@@ -7,16 +7,26 @@ require Pod::Executable.execute_command('node', ['-p',
   __dir__
 ]).strip
 
+require_relative '../node_modules/react-native-permissions/scripts/setup.rb'
+
 platform :ios, '16.0'
 use_frameworks! :linkage => :static
 prepare_react_native_project!
+
+setup_permissions([
+  'Camera',
+  'LocationWhenInUse',
+  'PhotoLibrary',
+  'LocationAlways',
+  'Notifications',
+])
 
 linkage = ENV['USE_FRAMEWORKS']
 if linkage
   use_frameworks! :linkage => linkage.to_sym
 end
 
-target 'RNBoilerplate' do
+target 'OutdoorServiceBooking' do
   config = use_native_modules!
 
   use_react_native!(
@@ -37,11 +47,6 @@ target 'RNBoilerplate' do
   pod 'RNFBRemoteConfig', :path => '../node_modules/@react-native-firebase/remote-config'
   pod 'RNFBML', :path => '../node_modules/@react-native-firebase/ml'
   pod 'RNPermissions', :path => '../node_modules/react-native-permissions'
-  pod 'Permission-Camera', :path => "#{permissions_path}/Camera"
-  pod 'Permission-LocationWhenInUse', :path => "#{permissions_path}/LocationWhenInUse"
-pod 'Permission-PhotoLibrary', :path => "#{permissions_path}/PhotoLibrary"
-pod 'Permission-LocationAlways', :path => "#{permissions_path}/LocationAlways"
-pod 'Permission-Notifications', :path => "#{permissions_path}/Notifications"
 
   post_install do |installer|
     react_native_post_install(installer, config[:reactNativePath], :mac_catalyst_enabled => false)
