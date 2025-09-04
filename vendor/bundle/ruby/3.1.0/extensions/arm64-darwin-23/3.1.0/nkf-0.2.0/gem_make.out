@@ -1,0 +1,15 @@
+current directory: /Users/trushal/Documents/RNBoilerplate/vendor/bundle/ruby/3.1.0/gems/nkf-0.2.0/ext/nkf
+/Users/trushal/.rbenv/versions/3.1.2/bin/ruby -I /Users/trushal/.rbenv/versions/3.1.2/lib/ruby/3.1.0 -r ./siteconf20250903-1350-a0cy7m.rb extconf.rb
+creating Makefile
+
+current directory: /Users/trushal/Documents/RNBoilerplate/vendor/bundle/ruby/3.1.0/gems/nkf-0.2.0/ext/nkf
+make DESTDIR\= clean
+
+current directory: /Users/trushal/Documents/RNBoilerplate/vendor/bundle/ruby/3.1.0/gems/nkf-0.2.0/ext/nkf
+make DESTDIR\=
+compiling nkf.c
+linking shared-object nkf.bundle
+
+current directory: /Users/trushal/Documents/RNBoilerplate/vendor/bundle/ruby/3.1.0/gems/nkf-0.2.0/ext/nkf
+make DESTDIR\= install
+/opt/homebrew/bin/ginstall -c -m 0755 nkf.bundle ./.gem.20250903-1350-h52vfs
