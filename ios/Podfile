@@ -26,7 +26,7 @@ if linkage
   use_frameworks! :linkage => linkage.to_sym
 end
 
-target 'OutdoorServiceBooking' do
+target 'RNBoilerplate' do
   config = use_native_modules!
 
   use_react_native!(
