@@ -38,6 +38,7 @@ local.properties
 # node.js
 #
 node_modules/
+package-lock.json
 npm-debug.log
 yarn-error.log
 .env
@@ -59,6 +60,7 @@ yarn-error.log
 
 # Ruby / CocoaPods
 **/Pods/
+**/Podfile.lock/
 /vendor/bundle/
 
 # Temporary files created by Metro to check the health of the file watcher
@@ -74,4 +76,3 @@ yarn-error.log
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
- 
