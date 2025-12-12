@@ -34,6 +34,13 @@ yarn android
 
 ### iOS
 
+# Language Change Issue(RTL) :
+
+node_modules/react-native/React/fabric/Surface/RCTFabricSurface.mm
+
+view = [[RCTSurfaceView alloc]] initWith search this and before that add this :
+[self _updateLayoutContext];
+
 For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
 
 The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
