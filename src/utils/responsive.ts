@@ -4,8 +4,28 @@ import { Dimensions, PixelRatio } from 'react-native';
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 // Based on standard screen sizes (iPhone X)
-const guidelineBaseWidth = 375;
-const guidelineBaseHeight = 812;
+const TABLET_MIN_WIDTH = 768;
+
+// Based on standard screen sizes
+// iPhone X for phones, iPad Pro 11" for tablets
+const guidelineBaseWidth = SCREEN_WIDTH >= TABLET_MIN_WIDTH ? 834 : 375;
+const guidelineBaseHeight = SCREEN_WIDTH >= TABLET_MIN_WIDTH ? 1194 : 812;
+
+/**
+ * Check if current device is a tablet
+ */
+export const isTablet = (): boolean => {
+  return SCREEN_WIDTH >= TABLET_MIN_WIDTH;
+};
+
+/**
+ * Get responsive value based on device type
+ * @param phoneValue - Value to use on phones
+ * @param tabletValue - Value to use on tablets
+ */
+export const getResponsiveValue = <T,>(phoneValue: T, tabletValue: T): T => {
+  return isTablet() ? tabletValue : phoneValue;
+};
 
 // Scale size horizontally
 export const scale = (size: number): number =>
