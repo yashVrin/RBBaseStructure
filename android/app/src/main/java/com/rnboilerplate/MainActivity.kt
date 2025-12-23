@@ -16,7 +16,7 @@ class MainActivity : ReactActivity() {
 
    override fun onCreate(savedInstanceState: Bundle?) {
         SplashScreen.show(this) // <- Show splash screen
-        super.onCreate(savedInstanceState)
+        super.onCreate(null)
     }
     
   override fun getMainComponentName(): String = "RNBoilerplate"

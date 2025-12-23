@@ -1,5 +1,5 @@
-import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, Switch, Linking, AppState, AppStateStatus } from 'react-native';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
 import Fonts from '@assets/Fonts';
 import Colors from '@assets/Colors';
@@ -10,12 +10,42 @@ import { setLoggedOut } from '@store/slices/authSlice';
 import { RootState } from '@store/store';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { useI18n } from '../../../i18n/i18n';
+import notifee, { AuthorizationStatus } from '@notifee/react-native';
 
 const ProfileScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
   const dispatch = useDispatch();
   const { t } = useI18n();
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const appState = useRef(AppState.currentState);
+
+  const checkNotificationStatus = async () => {
+    const settings = await notifee.getNotificationSettings();
+    setNotificationsEnabled(settings.authorizationStatus === AuthorizationStatus.AUTHORIZED);
+  };
+
+  useEffect(() => {
+    checkNotificationStatus();
+
+    const subscription = AppState.addEventListener('change', (nextAppState: AppStateStatus) => {
+      if (
+        appState.current.match(/inactive|background/) &&
+        nextAppState === 'active'
+      ) {
+        checkNotificationStatus();
+      }
+      appState.current = nextAppState;
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
+
+  const toggleNotifications = async () => {
+    await Linking.openSettings();
+  };
 
   const NavigationView = () => {
     return (
@@ -35,6 +65,16 @@ const ProfileScreen: React.FC = () => {
         <TouchableOpacity onPress={() => navigation.navigate('Language')}>
           <Text style={styles.textProfile1}>{t('changeLanguage')}</Text>
         </TouchableOpacity>
+
+        <View style={styles.row}>
+          <Text style={styles.textProfile1}>{t('notifications')}</Text>
+          <Switch
+            value={notificationsEnabled}
+            onValueChange={toggleNotifications}
+            trackColor={{ false: Colors.GRAY_LIGHT, true: Colors.PRIMARY_LIGHT }}
+            thumbColor={notificationsEnabled ? Colors.PRIMARY : Colors.GRAY}
+          />
+        </View>
 
         <TouchableOpacity
           onPress={() => {
@@ -88,5 +128,10 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.BACKGROUND,
     padding: 16,
     marginTop: 12,
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
 });

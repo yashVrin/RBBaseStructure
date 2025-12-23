@@ -29,6 +29,7 @@ const dictionaries: Record<SupportedLang, Record<string, string>> = {
     cameraPermission: 'Camera Permission',
     locationPermission: 'Location Permission',
     storagePermission: 'Storage Permission',
+    notifications: 'Notifications',
     unknownResult: 'Unknown result',
   },
   fr: {
@@ -50,6 +51,7 @@ const dictionaries: Record<SupportedLang, Record<string, string>> = {
     cameraPermission: 'Permission de la caméra',
     locationPermission: 'Permission de localisation',
     storagePermission: 'Permission de stockage',
+    notifications: 'Notifications',
     unknownResult: 'Résultat inconnu',
   },
   ar: {
@@ -71,6 +73,7 @@ const dictionaries: Record<SupportedLang, Record<string, string>> = {
     cameraPermission: 'إذن الكاميرا',
     locationPermission: 'إذن الموقع',
     storagePermission: 'إذن التخزين',
+    notifications: 'الإشعارات',
     unknownResult: 'نتيجة غير معروفة',
   },
 };
