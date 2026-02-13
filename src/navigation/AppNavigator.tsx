@@ -29,27 +29,68 @@ const AppNavigator: React.FC = () => (
   <NavigationContainer>
     <Stack.Navigator
       initialRouteName="Splash"
-      screenOptions={{ headerShown: false }}
+      screenOptions={{
+        headerShown: false,
+        animation: 'slide_from_right', // Default premium slide
+        animationDuration: 400, // Slightly longer for smoother feel
+        fullScreenGestureEnabled: true, // Allow swiping back from anywhere
+      }}
     >
-      <Stack.Screen name="Splash" component={SplashScreen} />
-      <Stack.Screen name="Login" component={Login} />
+      <Stack.Screen
+        name="Splash"
+        component={SplashScreen}
+        options={{ animation: 'fade' }}
+      />
+      <Stack.Screen
+        name="Login"
+        component={Login}
+        options={{
+          animation: 'fade',
+          animationTypeForReplace: 'push' // Smooth replacement
+        }}
+      />
       <Stack.Screen
         name="LoggerFile"
         component={LoggerFile}
-        options={{ headerShown: true }}
+        options={{
+          headerShown: true,
+          animation: 'slide_from_bottom',
+          presentation: 'modal' // Modal feel for logger
+        }}
       />
       <Stack.Screen
         name="Search"
         component={Search}
-        options={{ headerShown: true }}
+        options={{
+          headerShown: true,
+          animation: 'fade_from_bottom'
+        }}
       />
       <Stack.Screen
         name="OtpInputScreen"
         component={OtpInputScreen}
-        options={{ headerShown: false }}
+        options={{
+          headerShown: false,
+          animation: 'slide_from_bottom'
+        }}
       />
-      <Stack.Screen name="BottomTabs" component={BottomTabs} />
-      <Stack.Screen name="Language" component={LanguageScreen} options={{ headerShown: true, title: 'Language' }} />
+      <Stack.Screen
+        name="BottomTabs"
+        component={BottomTabs}
+        options={{
+          animation: 'fade',
+          animationTypeForReplace: 'push' // Premium entry to main app
+        }}
+      />
+      <Stack.Screen
+        name="Language"
+        component={LanguageScreen}
+        options={{
+          headerShown: true,
+          title: 'Language',
+          animation: 'slide_from_right'
+        }}
+      />
     </Stack.Navigator>
   </NavigationContainer>
 );

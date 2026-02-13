@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Animated } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import HomeScreen from '../screens/main/HomeScreen/HomeScreen';
 import Search from '../screens/main/Search/Search';
@@ -7,6 +8,34 @@ import ProfileScreen from '../screens/main/ProfileScreen/ProfileScreen';
 import SettingsScreen from '../screens/main/SettingsScreen/SettingsScreen';
 import Colors from '@assets/Colors';
 import { useI18n } from '../i18n/i18n';
+
+import TabTransitionOverlay from '../components/TabTransitionOverlay';
+
+// Custom Tab Bar Icon Component with Animation
+interface AnimatedTabIconProps {
+  name: string;
+  color: string;
+  size: number;
+  focused: boolean;
+}
+
+const AnimatedTabIcon: React.FC<AnimatedTabIconProps> = ({ name, color, size, focused }) => {
+  const scale = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    Animated.spring(scale, {
+      toValue: focused ? 1.2 : 1,
+      useNativeDriver: true,
+      friction: 5,
+    }).start();
+  }, [focused, scale]);
+
+  return (
+    <Animated.View style={{ transform: [{ scale }] }}>
+      <Ionicons name={name} size={size} color={color} />
+    </Animated.View>
+  );
+};
 
 // Define param list for Bottom Tabs (adjust params if your screens accept any)
 export type BottomTabParamList = {
@@ -26,34 +55,70 @@ const BottomTabs: React.FC = () => {
         headerShown: false,
         tabBarActiveTintColor: Colors.PRIMARY,
         tabBarInactiveTintColor: Colors.GRAY,
-        tabBarIcon: ({ color, size }) => {
+        tabBarIcon: ({ color, size, focused }) => {
           let iconName: string;
 
           switch (route.name) {
             case 'Home':
-              iconName = 'home-outline';
+              iconName = focused ? 'home' : 'home-outline';
               break;
             case 'Search':
-              iconName = 'search-outline';
+              iconName = focused ? 'search' : 'search-outline';
               break;
             case 'Profile':
-              iconName = 'person-outline';
+              iconName = focused ? 'person' : 'person-outline';
               break;
             case 'Settings':
-              iconName = 'settings-outline';
+              iconName = focused ? 'settings' : 'settings-outline';
               break;
             default:
               iconName = 'ellipse-outline';
           }
 
-          return <Ionicons name={iconName} size={size} color={color} />;
+          return <AnimatedTabIcon name={iconName} size={size} color={color} focused={focused} />;
         },
       })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} options={{ title: t('home') }} />
-      <Tab.Screen name="Search" component={Search} options={{ title: t('search') }} />
-      <Tab.Screen name="Profile" component={ProfileScreen} options={{ title: t('profile') }} />
-      <Tab.Screen name="Settings" component={SettingsScreen} options={{ title: t('settings') }} />
+      <Tab.Screen
+        name="Home"
+        options={{ title: t('home') }}
+      >
+        {() => (
+          <TabTransitionOverlay>
+            <HomeScreen />
+          </TabTransitionOverlay>
+        )}
+      </Tab.Screen>
+      <Tab.Screen
+        name="Search"
+        options={{ title: t('search') }}
+      >
+        {() => (
+          <TabTransitionOverlay>
+            <Search />
+          </TabTransitionOverlay>
+        )}
+      </Tab.Screen>
+      <Tab.Screen
+        name="Profile"
+        options={{ title: t('profile') }}
+      >
+        {() => (
+          <TabTransitionOverlay>
+            <ProfileScreen />
+          </TabTransitionOverlay>
+        )}
+      </Tab.Screen>
+      <Tab.Screen
+        name="Settings"
+        options={{ title: t('settings') }}
+      >
+        {() => (
+          <TabTransitionOverlay>
+            <SettingsScreen />
+          </TabTransitionOverlay>
+        )}
+      </Tab.Screen>
     </Tab.Navigator>
   );
 };

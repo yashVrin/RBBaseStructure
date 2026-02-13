@@ -22,6 +22,8 @@ import messaging, {
 } from '@react-native-firebase/messaging';
 import Toast from 'react-native-root-toast';
 
+import LottieSplashScreen from '../../LottieSplashScreen';
+
 // Define your navigation param list (adjust as needed)
 type RootStackParamList = {
   BottomTabs: undefined;
@@ -31,18 +33,61 @@ type RootStackParamList = {
 const SplashScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      navigation.dispatch(
-        CommonActions.reset({
-          index: 0,
-          routes: [{ name: 'BottomTabs' }],
-        }),
-      ); // Navigate to main app
-    }, 2000);
+  const navigateToHome = () => {
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [{ name: 'BottomTabs' }],
+      }),
+    );
+  };
 
-    return () => clearTimeout(timer); // Clean up timer on unmount
-  }, [navigation]);
+  useEffect(() => {
+    // Permission and Notification logic
+    const setupApp = async () => {
+      try {
+        console.log('SplashScreen: Starting setup...');
+        const hasPermission = await requestUserPermission();
+        console.log('SplashScreen: Permission status:', hasPermission);
+
+        if (hasPermission) {
+          const fcmToken = await messaging().getToken();
+          console.log('❄️ FCM Token:', fcmToken);
+        } else {
+          console.log('SplashScreen: Not authorized for notifications');
+        }
+
+        const remoteMessage = await messaging().getInitialNotification();
+        console.log('SplashScreen: Initial notification:', remoteMessage);
+
+        const onOpenedUnsubscribe = messaging().onNotificationOpenedApp(msg => {
+          console.log('SplashScreen: Notification opened:', msg);
+        });
+
+        const onMessageUnsubscribe = messaging().onMessage(onMessageReceived);
+
+        return () => {
+          onOpenedUnsubscribe();
+          onMessageUnsubscribe();
+        };
+      } catch (error) {
+        console.error('Splash screen setup error detail:', error);
+      }
+    };
+
+    const cleanupPromise = setupApp();
+
+    // Fallback timer: ensure navigation happens after 4 seconds even if animation fails
+    const timer = setTimeout(() => {
+      console.log('Splash fallback timer triggered');
+      navigateToHome();
+    }, 4000);
+
+    return () => {
+      clearTimeout(timer);
+      cleanupPromise.then(cleanup => cleanup && cleanup());
+    };
+  }, []);
 
   // Request iOS permission or Android notification permission
   const requestUserPermission = async (): Promise<boolean> => {
@@ -54,84 +99,28 @@ const SplashScreen: React.FC = () => {
       );
     } else {
       await requestPermissionsNotifications();
-      return true; // Assume true since Android below 13 doesn't require explicit permission
+      return true;
     }
   };
 
   const requestPermissionsNotifications = async (): Promise<void> => {
     if (Platform.OS === 'android' && Platform.Version >= 33) {
       const notifPermission = PERMISSIONS.ANDROID.POST_NOTIFICATIONS;
-  
-      if (!notifPermission) {
-        console.log('POST_NOTIFICATIONS not available in this RN Permissions version');
-        return;
-      }
-  
+      if (!notifPermission) return;
       try {
-        const result = await request(notifPermission);
-        if (result === RESULTS.GRANTED) {
-          console.log('Notification permission granted ✅');
-        } else {
-          console.log('Notification permission denied ❌');
-        }
+        await request(notifPermission);
       } catch (error) {
         console.log('Notification permission error:', error);
       }
-    } else {
-      console.log('Notification permission not required on Android < 13');
     }
   };
-  
-
-  useEffect(() => {
-    (async () => {
-      const hasPermission = await requestUserPermission();
-
-      if (hasPermission) {
-        const fcmToken = await messaging().getToken();
-        console.log('❄️ FCM Token:', fcmToken);
-      } else {
-        console.log('Not authorized for notifications');
-      }
-
-      messaging()
-        .getInitialNotification()
-        .then(remoteMessage => {
-          console.log('Initial notification:', remoteMessage);
-          if (remoteMessage) {
-            // Handle initial notification
-          }
-        });
-
-      messaging().onNotificationOpenedApp(remoteMessage => {
-        console.log('Notification opened:', remoteMessage);
-        if (remoteMessage) {
-          // Handle notification opened when app is in background
-        }
-      });
-
-      messaging().setBackgroundMessageHandler(
-        async (remoteMessage: FirebaseMessagingTypes.RemoteMessage) => {
-          // Handle background message
-        },
-      );
-
-      const unsubscribe = messaging().onMessage(onMessageReceived);
-
-      return () => {
-        unsubscribe();
-      };
-    })();
-  }, []);
 
   const onMessageReceived = async (
     message: FirebaseMessagingTypes.RemoteMessage,
   ) => {
-    // Create a channel (required for Android)
     const channelId = await notifee.createChannel({
       id: 'default',
       name: 'App',
-      badge: false,
     });
 
     try {
@@ -139,70 +128,21 @@ const SplashScreen: React.FC = () => {
         id: message.messageId,
         title: message.notification?.title,
         body: message.notification?.body,
-        data: message.data,
         android: {
           channelId,
           importance: AndroidImportance.HIGH,
-          badgeIconType: AndroidBadgeIconType.SMALL,
-          pressAction: {
-            id: 'default',
-          },
-          showTimestamp: true,
-          badgeCount: 0,
-        },
-        ios: {
-          foregroundPresentationOptions: {
-            alert: true,
-            badge: true,
-            sound: true,
-          },
-          critical: true,
         },
       });
     } catch (error) {
-      console.error('Notifee displayNotification error:', error);
+      console.error('Notifee error:', error);
     }
-
-    notifee.onBackgroundEvent(
-      async ({ type, detail }: { type: EventType; detail: any }) => {
-        const { notification, pressAction } = detail;
-
-        if (type === EventType.PRESS) {
-          // TODO: Navigate based on notification
-        }
-        await notifee.cancelNotification(notification.id);
-      },
-    );
-
-    notifee.onForegroundEvent(
-      ({ type, detail }: { type: EventType; detail: any }) => {
-        if (type === EventType.PRESS) {
-          // TODO: Handle press in foreground
-        }
-      },
-    );
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>App</Text>
-      <ActivityIndicator size="large" color="#000" />
-    </View>
+    <LottieSplashScreen onAnimationFinish={navigateToHome} />
   );
 };
 
 export default SplashScreen;
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-});
+const styles = StyleSheet.create({});

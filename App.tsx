@@ -1,19 +1,17 @@
-import React, { useEffect } from 'react';
-import { AppState, AppStateStatus } from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {AppState, AppStateStatus} from 'react-native';
 import AppNavigator from './src/navigation/AppNavigator';
-import { Provider } from 'react-redux';
+import {Provider} from 'react-redux';
 import store from './src/store/store';
 import notifee from '@notifee/react-native';
 import SplashScreen from 'react-native-splash-screen';
-import { initializeFirebase } from './src/utils/firebaseConfig';
-import { I18nProvider } from './src/i18n/i18n';
-import firebase from '@react-native-firebase/app';
+import {initializeFirebase} from './src/utils/firebaseConfig';
+import {I18nProvider} from './src/i18n/i18n';
+import LottieSplashScreen from './src/screens/LottieSplashScreen';
 
-
-if (!firebase.apps.length) {
-  firebase.initializeApp();
-}
 const App: React.FC = () => {
+  const [showLottieSplash, setShowLottieSplash] = useState(true);
+
   useEffect(() => {
     const handleAppStateChange = (nextAppState: AppStateStatus) => {
       if (nextAppState === 'active') {
@@ -31,14 +29,25 @@ const App: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    SplashScreen.hide();
     initializeFirebase();
+    // Hide native splash screen to allow Lottie animation to take over
+    setTimeout(() => {
+      SplashScreen.hide();
+    }, 100);
   }, []);
+
+  const handleAnimationFinish = () => {
+    setShowLottieSplash(false);
+  };
 
   return (
     <Provider store={store}>
       <I18nProvider>
-        <AppNavigator />
+        {showLottieSplash ? (
+          <LottieSplashScreen onAnimationFinish={handleAnimationFinish} />
+        ) : (
+          <AppNavigator />
+        )}
       </I18nProvider>
     </Provider>
   );
