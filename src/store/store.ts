@@ -4,20 +4,23 @@ import { persistStore, persistReducer, PersistConfig } from 'redux-persist';
 import authReducer from './slices/authSlice';
 import postsReducer from './slices/postsSlice';
 import photosReducer from './slices/photosSlice';
+import subscriptionReducer from './slices/subscriptionSlice';
 
 // ✅ Combine reducers
 const rootReducer = combineReducers({
   auth: authReducer,
   posts: postsReducer,
   photos: photosReducer,
+  subscription: subscriptionReducer,
 });
 
 // ✅ Redux-persist config
 const persistConfig: PersistConfig<RootState> = {
   key: 'root',
   storage: AsyncStorage,
-  whitelist: ['auth'],
+  whitelist: ['auth', 'subscription'],
 };
+
 
 // ✅ Create persisted reducer
 const persistedReducer = persistReducer(persistConfig, rootReducer);

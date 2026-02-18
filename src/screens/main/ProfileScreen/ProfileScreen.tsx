@@ -66,6 +66,11 @@ const ProfileScreen: React.FC = () => {
           <Text style={styles.textProfile1}>{t('changeLanguage')}</Text>
         </TouchableOpacity>
 
+        <TouchableOpacity onPress={() => navigation.navigate('Paywall')}>
+          <Text style={styles.textProfile1}>Premium Subscription ✨</Text>
+        </TouchableOpacity>
+
+
         <View style={styles.row}>
           <Text style={styles.textProfile1}>{t('notifications')}</Text>
           <Switch

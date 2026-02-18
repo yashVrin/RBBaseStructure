@@ -11,8 +11,10 @@ import SplashScreen from '../screens/auth/SplashScreen/SplashScreen';
 import LoggerFile from '../screens/main/LoggerFile/LoggerFile';
 import OtpInputScreen from '../screens/auth/OtpInputScreen/OtpInputScreen';
 import LanguageScreen from '../screens/main/Language/LanguageScreen';
+import PaywallScreen from '../screens/main/PaywallScreen';
 
 // Define types for stack params if needed (you can add params if your screens use them)
+
 export type RootStackParamList = {
   Splash: undefined;
   Login: undefined;
@@ -21,7 +23,9 @@ export type RootStackParamList = {
   OtpInputScreen: undefined;
   BottomTabs: undefined;
   Language: undefined;
+  Paywall: undefined;
 };
+
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -91,7 +95,18 @@ const AppNavigator: React.FC = () => (
           animation: 'slide_from_right'
         }}
       />
+      <Stack.Screen
+        name="Paywall"
+        component={PaywallScreen}
+        options={{
+          headerShown: true,
+          title: 'Premium',
+          animation: 'slide_from_bottom',
+          presentation: 'modal'
+        }}
+      />
     </Stack.Navigator>
+
   </NavigationContainer>
 );
 
