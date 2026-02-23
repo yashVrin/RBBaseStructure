@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import {
   TouchableOpacity,
   Text,
@@ -6,6 +6,7 @@ import {
   GestureResponderEvent,
   StyleProp,
   ViewStyle,
+  Animated,
 } from 'react-native';
 import Colors from '@assets/Colors';
 
@@ -16,19 +17,50 @@ type BaseButtonProps = {
   style?: StyleProp<ViewStyle>; // Optional: if you want to allow custom styling
 };
 
+const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
+
 const BaseButton: React.FC<BaseButtonProps> = ({
   title,
   onPress,
   disabled = false,
+  style,
 }) => {
+  const scaleValue = useRef(new Animated.Value(1)).current;
+
+  const handlePressIn = () => {
+    Animated.spring(scaleValue, {
+      toValue: 0.96,
+      useNativeDriver: true,
+      tension: 40,
+      friction: 3,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scaleValue, {
+      toValue: 1,
+      useNativeDriver: true,
+      tension: 40,
+      friction: 3,
+    }).start();
+  };
+
   return (
-    <TouchableOpacity
-      style={[styles.button, disabled && styles.buttonDisabled]}
+    <AnimatedTouchableOpacity
+      activeOpacity={0.8}
+      style={[
+        styles.button,
+        style,
+        disabled && styles.buttonDisabled,
+        { transform: [{ scale: scaleValue }] },
+      ]}
       onPress={onPress}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
       disabled={disabled}
     >
       <Text style={styles.text}>{title}</Text>
-    </TouchableOpacity>
+    </AnimatedTouchableOpacity>
   );
 };
 

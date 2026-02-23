@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import PermissionHandler from '@utils/PermissionHandler';
 import ScreenContainer from '@components/ScreenContainer';
+import AnimatedListItem from '@components/AnimatedListItem';
 import { useI18n } from '../../../i18n/i18n';
 
 type PermissionKey = 'camera' | 'location' | 'storage';
@@ -54,13 +55,15 @@ const Search: React.FC = () => {
     Alert.alert(titleMap[key], result?.message || t('unknownResult'));
   };
 
-  const renderItem: ListRenderItem<PermissionItem> = ({ item }) => (
-    <TouchableOpacity
-      style={styles.button}
-      onPress={() => handlePermissionRequest(item.key)}
-    >
-      <Text style={styles.buttonText}>{item.label}</Text>
-    </TouchableOpacity>
+  const renderItem: ListRenderItem<PermissionItem> = ({ item, index }) => (
+    <AnimatedListItem index={index}>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => handlePermissionRequest(item.key)}
+      >
+        <Text style={styles.buttonText}>{item.label}</Text>
+      </TouchableOpacity>
+    </AnimatedListItem>
   );
 
   return (

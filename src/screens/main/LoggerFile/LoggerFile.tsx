@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import { LoggerService } from '@services/LoggerService';
+import AnimatedListItem from '@components/AnimatedListItem';
 
 interface LogItem {
   url?: string;
@@ -64,37 +65,39 @@ export default function LoggerFile() {
     const heightAnim = animatedControllers.current[index];
 
     return (
-      <View style={styles.logEntry}>
-        <TouchableOpacity onPress={() => toggleExpand(index)}>
-          <Text style={styles.urlText}>
-            {item.url || item.username || `Item ${index}`}
-          </Text>
-        </TouchableOpacity>
+      <AnimatedListItem index={index}>
+        <View style={styles.logEntry}>
+          <TouchableOpacity onPress={() => toggleExpand(index)}>
+            <Text style={styles.urlText}>
+              {item.url || item.username || `Item ${index}`}
+            </Text>
+          </TouchableOpacity>
 
-        <Animated.View
-          style={[styles.animatedContainer, { height: heightAnim }]}
-        >
-          <View
-            style={styles.detailsWrapper}
-            onLayout={(event: LayoutChangeEvent) => {
-              const height = event.nativeEvent.layout.height;
-              if (!measuredHeights[index]) {
-                setMeasuredHeights(prev => ({ ...prev, [index]: height }));
-              }
-            }}
+          <Animated.View
+            style={[styles.animatedContainer, { height: heightAnim }]}
           >
-            <Text>Time: {item.time}</Text>
-            <Text>Method: {item.method}</Text>
-            <Text>Status: {item.status}</Text>
-            {item.response && (
-              <Text>Response: {JSON.stringify(item.response)}</Text>
-            )}
-            {item.error && (
-              <Text style={styles.errorText}>Error: {item.error}</Text>
-            )}
-          </View>
-        </Animated.View>
-      </View>
+            <View
+              style={styles.detailsWrapper}
+              onLayout={(event: LayoutChangeEvent) => {
+                const height = event.nativeEvent.layout.height;
+                if (!measuredHeights[index]) {
+                  setMeasuredHeights(prev => ({ ...prev, [index]: height }));
+                }
+              }}
+            >
+              <Text>Time: {item.time}</Text>
+              <Text>Method: {item.method}</Text>
+              <Text>Status: {item.status}</Text>
+              {item.response && (
+                <Text>Response: {JSON.stringify(item.response)}</Text>
+              )}
+              {item.error && (
+                <Text style={styles.errorText}>Error: {item.error}</Text>
+              )}
+            </View>
+          </Animated.View>
+        </View>
+      </AnimatedListItem>
     );
   };
 

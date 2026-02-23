@@ -13,6 +13,7 @@ import { Loader } from '@components/Loader';
 import { hp, moderateScale, normalizeFont, wp } from '@utils/responsive';
 import useNetworkStatus from '@hooks/useNetworkStatus';
 import NoInternet from '@components/NoInternet';
+import AnimatedListItem from '@components/AnimatedListItem';
 import { fetchPhotos } from '@store/slices/photosSlice';
 import { RootState, AppDispatch } from '../../../store/store'; // Adjust paths accordingly
 
@@ -51,13 +52,15 @@ const SettingsScreen: React.FC = () => {
     return <NoInternet show={true} />;
   }
 
-  const renderItem: ListRenderItem<Photo> = ({ item }) => (
-    <TouchableOpacity onPress={() => {}}>
-      <View style={styles.card}>
-        <Text style={styles.title}>{item.name}</Text>
-        <Text>{item.email}</Text>
-      </View>
-    </TouchableOpacity>
+  const renderItem: ListRenderItem<Photo> = ({ item, index }) => (
+    <AnimatedListItem index={index}>
+      <TouchableOpacity onPress={() => { }}>
+        <View style={styles.card}>
+          <Text style={styles.title}>{item.name}</Text>
+          <Text>{item.email}</Text>
+        </View>
+      </TouchableOpacity>
+    </AnimatedListItem>
   );
 
   return (

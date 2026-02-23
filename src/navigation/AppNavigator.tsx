@@ -35,9 +35,9 @@ const AppNavigator: React.FC = () => (
       initialRouteName="Splash"
       screenOptions={{
         headerShown: false,
-        animation: 'slide_from_right', // Default premium slide
-        animationDuration: 400, // Slightly longer for smoother feel
-        fullScreenGestureEnabled: true, // Allow swiping back from anywhere
+        animation: 'slide_from_right', // Smooth slide default
+        animationDuration: 450, // Premium slower feel
+        fullScreenGestureEnabled: true,
       }}
     >
       <Stack.Screen
@@ -49,8 +49,8 @@ const AppNavigator: React.FC = () => (
         name="Login"
         component={Login}
         options={{
-          animation: 'fade',
-          animationTypeForReplace: 'push' // Smooth replacement
+          animation: 'fade_from_bottom', // Modern entry
+          animationTypeForReplace: 'push'
         }}
       />
       <Stack.Screen
@@ -59,7 +59,7 @@ const AppNavigator: React.FC = () => (
         options={{
           headerShown: true,
           animation: 'slide_from_bottom',
-          presentation: 'modal' // Modal feel for logger
+          presentation: 'modal'
         }}
       />
       <Stack.Screen
@@ -75,7 +75,7 @@ const AppNavigator: React.FC = () => (
         component={OtpInputScreen}
         options={{
           headerShown: false,
-          animation: 'slide_from_bottom'
+          animation: 'slide_from_right'
         }}
       />
       <Stack.Screen
@@ -83,7 +83,7 @@ const AppNavigator: React.FC = () => (
         component={BottomTabs}
         options={{
           animation: 'fade',
-          animationTypeForReplace: 'push' // Premium entry to main app
+          animationTypeForReplace: 'push'
         }}
       />
       <Stack.Screen

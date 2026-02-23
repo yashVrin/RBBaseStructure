@@ -12,6 +12,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
 import RevenueCatService from '../../services/RevenueCatService';
 import { PurchasesPackage } from 'react-native-purchases';
+import AnimatedListItem from '@components/AnimatedListItem';
 
 const PaywallScreen: React.FC = () => {
     const { offerings, loading, isPremium, error } = useSelector(
@@ -36,17 +37,19 @@ const PaywallScreen: React.FC = () => {
         }
     };
 
-    const renderPackage = ({ item }: { item: PurchasesPackage }) => (
-        <TouchableOpacity
-            style={styles.packageCard}
-            onPress={() => handlePurchase(item)}
-        >
-            <View>
-                <Text style={styles.packageTitle}>{item.product.title}</Text>
-                <Text style={styles.packageDescription}>{item.product.description}</Text>
-            </View>
-            <Text style={styles.packagePrice}>{item.product.priceString}</Text>
-        </TouchableOpacity>
+    const renderPackage = ({ item, index }: { item: PurchasesPackage; index: number }) => (
+        <AnimatedListItem index={index}>
+            <TouchableOpacity
+                style={styles.packageCard}
+                onPress={() => handlePurchase(item)}
+            >
+                <View>
+                    <Text style={styles.packageTitle}>{item.product.title}</Text>
+                    <Text style={styles.packageDescription}>{item.product.description}</Text>
+                </View>
+                <Text style={styles.packagePrice}>{item.product.priceString}</Text>
+            </TouchableOpacity>
+        </AnimatedListItem>
     );
 
     if (loading && !offerings) {

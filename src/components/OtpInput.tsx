@@ -5,6 +5,7 @@ import {
   StyleSheet,
   NativeSyntheticEvent,
   TextInputKeyPressEventData,
+  Animated,
 } from 'react-native';
 import Colors from '@assets/Colors';
 
@@ -12,15 +13,34 @@ type OtpInputProps = {
   code: string;
   setCode: (code: string) => void;
   maxLength?: number;
+  error?: boolean;
 };
+
+const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
 
 const OtpInput: React.FC<OtpInputProps> = ({
   code,
   setCode,
   maxLength = 6,
+  error = false,
 }) => {
   // Array of refs for TextInputs
   const inputsRef = useRef<Array<TextInput | null>>([]);
+  const shakeAnim = useRef(new Animated.Value(0)).current;
+  const animatedValues = useRef(
+    Array.from({ length: maxLength }).map(() => new Animated.Value(0)),
+  ).current;
+
+  React.useEffect(() => {
+    if (error) {
+      Animated.sequence([
+        Animated.timing(shakeAnim, { toValue: 10, duration: 50, useNativeDriver: true }),
+        Animated.timing(shakeAnim, { toValue: -10, duration: 50, useNativeDriver: true }),
+        Animated.timing(shakeAnim, { toValue: 10, duration: 50, useNativeDriver: true }),
+        Animated.timing(shakeAnim, { toValue: 0, duration: 50, useNativeDriver: true }),
+      ]).start();
+    }
+  }, [error, shakeAnim]);
 
   const handleChange = (text: string, index: number) => {
     const updatedCode = code.split('');
@@ -41,23 +61,62 @@ const OtpInput: React.FC<OtpInputProps> = ({
     }
   };
 
+  const handleFocus = (index: number) => {
+    Animated.spring(animatedValues[index], {
+      toValue: 1,
+      useNativeDriver: false,
+      friction: 8,
+      tension: 40,
+    }).start();
+  };
+
+  const handleBlur = (index: number) => {
+    Animated.spring(animatedValues[index], {
+      toValue: 0,
+      useNativeDriver: false,
+      friction: 8,
+      tension: 40,
+    }).start();
+  };
+
   return (
-    <View style={styles.container}>
-      {Array.from({ length: maxLength }).map((_, index) => (
-        <TextInput
-          key={index}
-          ref={(ref: TextInput | null) => {
-            inputsRef.current[index] = ref;
-          }}
-          style={styles.input}
-          keyboardType="number-pad"
-          maxLength={1}
-          onChangeText={text => handleChange(text, index)}
-          onKeyPress={e => handleKeyPress(e, index)}
-          value={code[index] || ''}
-        />
-      ))}
-    </View>
+    <Animated.View style={[styles.container, { transform: [{ translateX: shakeAnim }] }]}>
+      {Array.from({ length: maxLength }).map((_, index) => {
+        const borderColor = animatedValues[index].interpolate({
+          inputRange: [0, 1],
+          outputRange: [Colors.GRAY, Colors.PRIMARY],
+        });
+
+        const scale = animatedValues[index].interpolate({
+          inputRange: [0, 1],
+          outputRange: [1, 1.1],
+        });
+
+        return (
+          <AnimatedTextInput
+            key={index}
+            ref={(ref: any) => {
+              inputsRef.current[index] = ref;
+            }}
+            style={[
+              styles.input,
+              {
+                borderColor,
+                transform: [{ scale }],
+                borderWidth: 1.5, // Slightly thicker for focus
+              },
+            ]}
+            keyboardType="number-pad"
+            maxLength={1}
+            onChangeText={(text: string) => handleChange(text, index)}
+            onKeyPress={(e: NativeSyntheticEvent<TextInputKeyPressEventData>) => handleKeyPress(e, index)}
+            onFocus={() => handleFocus(index)}
+            onBlur={() => handleBlur(index)}
+            value={code[index] || ''}
+          />
+        );
+      })}
+    </Animated.View>
   );
 };
 
