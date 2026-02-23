@@ -1,0 +1,37 @@
+name: Android Firebase Distribution
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+jobs:
+  distribute:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1' # Using a newer ruby version in CI for better compatibility
+          bundler-cache: true
+
+      - name: Install Node dependencies
+        run: npm install
+
+      - name: Decode Firebase Service Account Key
+        run: echo "${{ secrets.FIREBASE_DISTRIBUTION_KEY_JSON }}" > android/firebase-auth.json
+
+      - name: Build and Distribute Android
+        run: npm run android:distribute
+        env:
+          FIREBASE_DISTRIBUTION_KEY_JSON: ${{ secrets.FIREBASE_DISTRIBUTION_KEY_JSON }}

@@ -1,0 +1,14 @@
+default_platform(:android)
+
+platform :android do
+  desc "Submit a new build to Firebase App Distribution"
+  lane :distribute do
+    gradle(task: "clean assembleRelease")
+
+    firebase_app_distribution(
+      app: "1:577882676291:android:6ffd101b6c7891eaad48f6", # You can get this from Firebase Console
+      groups: "testing-group", # Optional: Specify a group to distribute to
+      release_notes: "Initial distribution via Fastlane"
+    )
+  end
+end
