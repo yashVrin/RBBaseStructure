@@ -60,10 +60,12 @@ jobs:
         run: echo "${{ secrets.FIREBASE_DISTRIBUTION_KEY_JSON }}" > ${{ github.workspace }}/firebase-auth.json
 
       - name: Distribute via Fastlane
-        run: bundle install && bundle exec fastlane android upload_to_firebase
+        run: |
+          cd android
+          BUNDLE_GEMFILE=$PWD/../Gemfile bundle exec fastlane upload_to_firebase
         env:
           FIREBASE_AUTH_JSON_PATH: ${{ github.workspace }}/firebase-auth.json
-          APK_PATH: "../../app-release.apk"
+          APK_PATH: "../app-release.apk"
           RELEASE_NOTES: "GitHub Action build. Commit: ${{ github.sha }}"
 
   # Note: build_ios requires a macOS runner and is commented out 
