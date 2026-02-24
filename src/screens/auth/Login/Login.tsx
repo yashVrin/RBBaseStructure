@@ -45,7 +45,7 @@ const LoginScreen: React.FC = () => {
   return (
     <ScreenContainer>
       <View style={styles.container}>
-        <Text style={styles.title}>Login</Text>
+        <Text style={styles.title}>Log in</Text>
 
         <BaseTextInput
           placeholder="Phone Number"
