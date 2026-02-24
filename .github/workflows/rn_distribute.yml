@@ -23,8 +23,17 @@ jobs:
       - name: Install Node dependencies
         run: npm install
 
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'zulu'
+          cache: 'gradle' # This enables Gradle caching
+
       - name: Build Android Release APK
-        run: cd android && ./gradlew assembleRelease
+        run: |
+          cd android
+          ./gradlew assembleRelease
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
@@ -44,7 +53,7 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.1'
+          ruby-version: '3.3'
           bundler-cache: true
 
       - name: Download APK Artifact
@@ -65,11 +74,5 @@ jobs:
           BUNDLE_GEMFILE=$PWD/../Gemfile bundle exec fastlane upload_to_firebase
         env:
           FIREBASE_AUTH_JSON_PATH: ${{ github.workspace }}/firebase-auth.json
-          APK_PATH: "../app-release.apk"
+          APK_PATH: "../../app-release.apk"
           RELEASE_NOTES: "GitHub Action build. Commit: ${{ github.sha }}"
-
-  # Note: build_ios requires a macOS runner and is commented out 
-  # until you have a macOS runner or explicit requirement.
-  # build_ios:
-  #   runs-on: macos-latest
-  #   ...
