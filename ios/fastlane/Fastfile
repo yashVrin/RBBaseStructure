@@ -1,0 +1,20 @@
+default_platform(:ios)
+
+platform :ios do
+  desc "Submit a new build to Firebase App Distribution"
+  lane :distribute do
+    # build_app(scheme: "RNBoilerplate") # Requires proper provisioning
+    upload_to_firebase
+  end
+
+  desc "Upload existing build to Firebase"
+  lane :upload_to_firebase do |options|
+    firebase_app_distribution(
+      app: "YOUR_IOS_APP_ID", # Found in Firebase Console
+      groups: "testing-group",
+      # service_credentials_file: ENV["FIREBASE_AUTH_JSON_PATH"] || "../../firebase-auth.json",
+      ipa_path: options[:ipa_path] || "build/ios/ipa/RNBoilerplate.ipa",
+      release_notes: ENV["RELEASE_NOTES"] || "Standard iOS distribution via Fastlane"
+    )
+  end
+end

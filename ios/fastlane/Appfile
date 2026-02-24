@@ -1,0 +1,4 @@
+# app_identifier("com.rnboilerplate") # Your Apple ID Bundle Identifier
+# apple_id("your-email@example.com") # Your Apple Developer Portal username
+# itc_team_id("12345678") # App Store Connect Team ID
+# team_id("A1B2C3D4E5") # Apple Developer Portal Team ID

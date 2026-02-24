@@ -1,0 +1,71 @@
+name: React Native Multi-Platform Distribution
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - dev_hitendra
+
+jobs:
+  build_android:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install Node dependencies
+        run: npm install
+
+      - name: Build Android Release APK
+        run: cd android && ./gradlew assembleRelease
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-release-apk
+          path: android/app/build/outputs/apk/release/app-release.apk
+          retention-days: 7
+
+  distribute_android:
+    name: Distribute Android to Firebase
+    needs: build_android
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+          bundler-cache: true
+
+      - name: Download APK Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: android-release-apk
+          path: android/app/build/outputs/apk/release/
+
+      - name: Decode Firebase Service Account Key
+        run: echo "${{ secrets.FIREBASE_DISTRIBUTION_KEY_JSON }}" > ${{ github.workspace }}/firebase-auth.json
+
+      - name: Distribute via Fastlane
+        run: bundle exec fastlane android upload_to_firebase
+        env:
+          FIREBASE_AUTH_JSON_PATH: ${{ github.workspace }}/firebase-auth.json
+          APK_PATH: "app/build/outputs/apk/release/app-release.apk"
+          RELEASE_NOTES: "GitHub Action build. Commit: ${{ github.sha }}"
+
+  # Note: build_ios requires a macOS runner and is commented out 
+  # until you have a macOS runner or explicit requirement.
+  # build_ios:
+  #   runs-on: macos-latest
+  #   ...

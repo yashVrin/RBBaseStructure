@@ -4,12 +4,17 @@ platform :android do
   desc "Submit a new build to Firebase App Distribution"
   lane :distribute do
     gradle(task: "clean assembleRelease")
+    upload_to_firebase
+  end
 
+  desc "Upload existing build to Firebase"
+  lane :upload_to_firebase do |options|
     firebase_app_distribution(
       app: "1:577882676291:android:6ffd101b6c7891eaad48f6",
       groups: "testing-group",
       service_credentials_file: ENV["FIREBASE_AUTH_JSON_PATH"] || "../../firebase-auth.json",
-      release_notes: ENV["RELEASE_NOTES"] || "Manual distribution via Fastlane"
+      apk_path: options[:apk_path] || "app/build/outputs/apk/release/app-release.apk",
+      release_notes: ENV["RELEASE_NOTES"] || "Standard distribution via Fastlane"
     )
   end
 end
