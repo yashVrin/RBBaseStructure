@@ -6,9 +6,10 @@ platform :android do
     gradle(task: "clean assembleRelease")
 
     firebase_app_distribution(
-      app: "1:577882676291:android:6ffd101b6c7891eaad48f6", # You can get this from Firebase Console
-      groups: "testing-group", # Optional: Specify a group to distribute to
-      release_notes: "Initial distribution via Fastlane"
+      app: "1:577882676291:android:6ffd101b6c7891eaad48f6",
+      groups: "testing-group",
+      service_credentials_file: "firebase-auth.json",
+      release_notes: ENV["RELEASE_NOTES"] || "Manual distribution via Fastlane"
     )
   end
 end

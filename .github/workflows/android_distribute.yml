@@ -35,3 +35,4 @@ jobs:
         run: npm run android:distribute
         env:
           FIREBASE_DISTRIBUTION_KEY_JSON: ${{ secrets.FIREBASE_DISTRIBUTION_KEY_JSON }}
+          RELEASE_NOTES: "Automatically distributed from GitHub Actions. Commit: ${{ github.sha }}"

@@ -129,11 +129,6 @@ PODS:
   - PromisesObjC (2.4.0)
   - PromisesSwift (2.4.0):
     - PromisesObjC (= 2.4.0)
-  - PurchasesHybridCommon (17.37.0):
-    - RevenueCat (= 5.58.0)
-  - PurchasesHybridCommonUI (17.37.0):
-    - PurchasesHybridCommon (= 17.37.0)
-    - RevenueCatUI (= 5.58.0)
   - RCT-Folly (2024.11.18.00):
     - boost
     - DoubleConversion
@@ -1750,9 +1745,6 @@ PODS:
     - React-logger (= 0.78.0)
     - React-perflogger (= 0.78.0)
     - React-utils (= 0.78.0)
-  - RevenueCat (5.58.0)
-  - RevenueCatUI (5.58.0):
-    - RevenueCat (= 5.58.0)
   - RNCAsyncStorage (1.24.0):
     - DoubleConversion
     - glog
@@ -1821,9 +1813,6 @@ PODS:
     - RNNotifee/NotifeeCore (= 9.1.8)
   - RNNotifee/NotifeeCore (9.1.8):
     - React-Core
-  - RNPaywalls (9.9.0):
-    - PurchasesHybridCommonUI (= 17.37.0)
-    - React-Core
   - RNPermissions (3.10.1):
     - DoubleConversion
     - glog
@@ -1845,9 +1834,6 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNPurchases (9.9.0):
-    - PurchasesHybridCommon (= 17.37.0)
-    - React-Core
   - RNScreens (4.15.4):
     - DoubleConversion
     - glog
@@ -2001,9 +1987,7 @@ DEPENDENCIES:
   - "RNFBRemoteConfig (from `../node_modules/@react-native-firebase/remote-config`)"
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - "RNNotifee (from `../node_modules/@notifee/react-native`)"
-  - RNPaywalls (from `../node_modules/react-native-purchases-ui`)
   - RNPermissions (from `../node_modules/react-native-permissions`)
-  - RNPurchases (from `../node_modules/react-native-purchases`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
@@ -2028,10 +2012,6 @@ SPEC REPOS:
     - nanopb
     - PromisesObjC
     - PromisesSwift
-    - PurchasesHybridCommon
-    - PurchasesHybridCommonUI
-    - RevenueCat
-    - RevenueCatUI
     - SocketRocket
 
 EXTERNAL SOURCES:
@@ -2198,12 +2178,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-gesture-handler"
   RNNotifee:
     :path: "../node_modules/@notifee/react-native"
-  RNPaywalls:
-    :path: "../node_modules/react-native-purchases-ui"
   RNPermissions:
     :path: "../node_modules/react-native-permissions"
-  RNPurchases:
-    :path: "../node_modules/react-native-purchases"
   RNScreens:
     :path: "../node_modules/react-native-screens"
   RNVectorIcons:
@@ -2238,8 +2214,6 @@ SPEC CHECKSUMS:
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   PromisesSwift: 9d77319bbe72ebf6d872900551f7eeba9bce2851
-  PurchasesHybridCommon: 5e012ecbd932092af743a8cec6bf55b605f2d89d
-  PurchasesHybridCommonUI: a1130f31aa43493b00d631d256dec6e28d91e904
   RCT-Folly: 36fe2295e44b10d831836cc0d1daec5f8abcf809
   RCTDeprecation: b2eecf2d60216df56bc5e6be5f063826d3c1ee35
   RCTRequired: 78522de7dc73b81f3ed7890d145fa341f5bb32ea
@@ -2305,8 +2279,6 @@ SPEC CHECKSUMS:
   ReactAppDependencyProvider: f2e81d80afd71a8058589e19d8a134243fa53f17
   ReactCodegen: 299e99fc57c93edc7c5396ef1a39a3a4d494f25d
   ReactCommon: c8fdbc582b98a07daf201cd95c1da75dd029f3ee
-  RevenueCat: 88bb4229115b2badcce0e5a97f3dd8cc952b38c8
-  RevenueCatUI: 127bebf87cab78e245b36eaca04e371d4f120ca3
   RNCAsyncStorage: 2118709bfe9c313eba06d0ae7c34592a07de8243
   RNFBApp: d2676150d5433b9371c315a38077e0276553965d
   RNFBCrashlytics: e9e4e4883c0c9cd9081afeb913b1283527ffff2e
@@ -2315,9 +2287,7 @@ SPEC CHECKSUMS:
   RNFBRemoteConfig: b2316ea8540af16251ed582228ed39a7f5870a4b
   RNGestureHandler: 433f2680b512ab94fe82e014365ea8785de09c4d
   RNNotifee: 4a6ee5c7deaf00e005050052d73ee6315dff7ec9
-  RNPaywalls: 8d028eacf14bb4a17ef050a70538a063aa4fbdfd
   RNPermissions: 471d44e09c3f70746e95ff4627cf778de8902f27
-  RNPurchases: 1b024f4867ab4c25faec1463bcad6ccdf3256250
   RNScreens: 1465a5fc1b457c50e59ad750a6ba1f7c1d9cec42
   RNVectorIcons: 656546fa945a04b69d54169c5f0173855bbe6a1d
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748

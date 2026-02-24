@@ -8,7 +8,6 @@ import SplashScreen from 'react-native-splash-screen';
 import { initializeFirebase } from './src/utils/firebaseConfig';
 import { I18nProvider } from './src/i18n/i18n';
 import LottieSplashScreen from './src/screens/LottieSplashScreen';
-import RevenueCatService from './src/services/RevenueCatService';
 
 
 const App: React.FC = () => {
@@ -32,7 +31,6 @@ const App: React.FC = () => {
 
   useEffect(() => {
     initializeFirebase();
-    RevenueCatService.initialize();
     // Hide native splash screen to allow Lottie animation to take over
     setTimeout(() => {
       SplashScreen.hide();
