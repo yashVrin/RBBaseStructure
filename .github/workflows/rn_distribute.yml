@@ -28,8 +28,8 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.3'
-          # We manually bundle install to ensure absolute control over the Gemfile location
-          
+          # We run bundle install manually for absolute control
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -37,18 +37,32 @@ jobs:
           distribution: 'zulu'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4 # High-speed official caching
+        uses: gradle/actions/setup-gradle@v4 # Official high-performance caching
+
+      - name: Install Ruby Dependencies
+        run: bundle install
 
       - name: Decode Firebase Service Account Key
         run: echo "${{ secrets.FIREBASE_DISTRIBUTION_KEY_JSON }}" > ${{ github.workspace }}/firebase-auth.json
 
-      - name: Build and Distribute Android
+      - name: Build Android Release APK
         run: |
-          # 1. Ensure gems are installed from the root
-          bundle install
-          
-          # 2. Match local distribution command exactly
-          npm run android:distribute
+          chmod +x android/gradlew
+          cd android
+          ./gradlew clean assembleRelease
+        env:
+          # Faster build on CI
+          JAVA_OPTS: "-Xmx4g"
+          _JAVA_OPTIONS: "-Xmx4g"
+          GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4g -Dorg.gradle.daemon=false"
+
+      - name: List Files (Debug)
+        run: ls -R android/app/build/outputs/apk/release/
+
+      - name: Distribute to Firebase
+        run: |
+          bundle exec fastlane android upload_to_firebase
         env:
           FIREBASE_AUTH_JSON_PATH: ${{ github.workspace }}/firebase-auth.json
+          APK_PATH: "${{ github.workspace }}/android/app/build/outputs/apk/release/app-release.apk"
           RELEASE_NOTES: "GitHub Action build. Commit: ${{ github.sha }}"

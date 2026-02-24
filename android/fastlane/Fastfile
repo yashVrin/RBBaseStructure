@@ -9,9 +9,10 @@ platform :android do
 
   desc "Upload existing build to Firebase"
   lane :upload_to_firebase do |options|
-    apk_path = options[:apk_path] || "app/build/outputs/apk/release/app-release.apk"
+    apk_path = options[:apk_path] || ENV["APK_PATH"] || "app/build/outputs/apk/release/app-release.apk"
     
-    UI.message("Verifying APK at path: #{File.absolute_path(apk_path)}")
+    UI.message("Using APK path: #{apk_path}")
+    UI.message("Absolute APK path: #{File.absolute_path(apk_path)}")
     unless File.exist?(apk_path)
       UI.user_error!("APK not found at path: #{apk_path}. Ensure the build job succeeded and path is correct.")
     end
