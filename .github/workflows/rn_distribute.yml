@@ -5,7 +5,6 @@ on:
     branches:
       - main
       - develop
-      - dev_hitendra
 
 jobs:
   build_android:
@@ -52,16 +51,19 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: android-release-apk
-          path: android/app/build/outputs/apk/release/
+          path: .
+
+      - name: List files (Debug)
+        run: ls -R
 
       - name: Decode Firebase Service Account Key
         run: echo "${{ secrets.FIREBASE_DISTRIBUTION_KEY_JSON }}" > ${{ github.workspace }}/firebase-auth.json
 
       - name: Distribute via Fastlane
-        run: bundle exec fastlane android upload_to_firebase
+        run: bundle install && bundle exec fastlane android upload_to_firebase
         env:
           FIREBASE_AUTH_JSON_PATH: ${{ github.workspace }}/firebase-auth.json
-          APK_PATH: "app/build/outputs/apk/release/app-release.apk"
+          APK_PATH: "../../app-release.apk"
           RELEASE_NOTES: "GitHub Action build. Commit: ${{ github.sha }}"
 
   # Note: build_ios requires a macOS runner and is commented out 
