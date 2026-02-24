@@ -29,7 +29,7 @@ jobs:
         run: npm install
 
       - name: Decode Firebase Service Account Key
-        run: echo "${{ secrets.FIREBASE_DISTRIBUTION_KEY_JSON }}" > android/firebase-auth.json
+        run: echo "${{ secrets.FIREBASE_DISTRIBUTION_KEY_JSON }}" > firebase-auth.json
 
       - name: Build and Distribute Android
         run: npm run android:distribute

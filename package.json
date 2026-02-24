@@ -8,7 +8,7 @@
     "lint": "eslint .",
     "start": "react-native start",
     "test": "jest",
-    "android:distribute": "cd android && arch -arm64 bundle exec fastlane distribute"
+    "android:distribute": "bundle exec fastlane android distribute"
   },
   "dependencies": {
     "@notifee/react-native": "^9.1.8",
