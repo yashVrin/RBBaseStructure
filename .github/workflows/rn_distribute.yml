@@ -5,8 +5,6 @@ on:
     branches:
       - main
       - develop
-      - dev_hitendra
-
 jobs:
   build_android:
     name: Build APK
@@ -58,7 +56,7 @@ jobs:
           retention-days: 7
 
   distribute_android:
-    name: Distribute to Firebase
+    name: Distribute Android to Firebase
     runs-on: ubuntu-latest
     needs: build_android
     steps:
@@ -94,7 +92,7 @@ jobs:
           APK_PATH="release/app-release.apk"
 
           # Resolve Firebase App ID — use secret or fall back to google-services.json
-          FIREBASE_APP_ID_RESOLVED="${FIREBASE_APP_ID:-$(grep -o '"mobilesdk_app_id":[[:space:]]*"[^"]*"' android/app/google-services.json | head -1 | cut -d'"' -f4)}"
+          FIREBASE_APP_ID_RESOLVED="${FIREBASE_APP_ID:-$(grep -o '\"mobilesdk_app_id\":[[:space:]]*\"[^\"]*\"' android/app/google-services.json | head -1 | cut -d'\"' -f4)}"
           if [ -z "$FIREBASE_APP_ID_RESOLVED" ]; then
             echo "❌ FIREBASE_APP_ID is empty and could not be read from android/app/google-services.json"
             exit 1
@@ -123,3 +121,63 @@ jobs:
           [ -n "$FIREBASE_TESTERS" ]       && DIST_CMD+=(--testers "$FIREBASE_TESTERS")
 
           "${DIST_CMD[@]}"
+
+  build_ios:
+    name: Build iOS IPA
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Node dependencies
+        run: npm install
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+
+      - name: Install Bundler and Ruby dependencies
+        run: |
+          gem install bundler
+          bundle install
+
+      - name: Cache Pods
+        uses: actions/cache@v4
+        with:
+          path: ios/Pods
+          key: ${{ runner.os }}-pods-${{ hashFiles('ios/Podfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pods-
+
+      - name: Install Pods
+        run: npx pod-install ios
+
+      - name: Build and Distribute iOS
+        env:
+          IOS_FIREBASE_APP_ID: ${{ secrets.IOS_FIREBASE_APP_ID }}
+          FIREBASE_TESTER_GROUPS: ${{ secrets.FIREBASE_TESTER_GROUPS }}
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          # Code signing envs (placeholders for Match or Manual)
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          FASTLANE_USER: ${{ secrets.APPLE_ID }}
+          FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+        run: |
+          # If using Match, it should be called before gym in the Fastfile or here
+          # For now, we assume certificates are accessible or Match is handled in Fastfile
+          bundle exec fastlane ios distribute
+        working-directory: ios
+
+      - name: Upload IPA as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-ios
+          path: ios/build/ios/ipa/RNBoilerplate.ipa
+          retention-days: 7
