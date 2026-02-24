@@ -160,18 +160,24 @@ jobs:
       - name: Install Pods
         run: npx pod-install ios
 
+      - name: Set up keychain
+        run: |
+          security create-keychain -p "" build.keychain
+          security list-keychains -s build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "" build.keychain
+          security set-keychain-settings -lut 21600 build.keychain
+
       - name: Build and Distribute iOS
         env:
           IOS_FIREBASE_APP_ID: ${{ secrets.IOS_FIREBASE_APP_ID }}
           FIREBASE_TESTER_GROUPS: ${{ secrets.FIREBASE_TESTER_GROUPS }}
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-          # Code signing envs (placeholders for Match or Manual)
-          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-          FASTLANE_USER: ${{ secrets.APPLE_ID }}
-          FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          # App Store Connect API Key Secrets
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}
         run: |
-          # If using Match, it should be called before gym in the Fastfile or here
-          # For now, we assume certificates are accessible or Match is handled in Fastfile
           bundle exec fastlane ios distribute
         working-directory: ios
 
