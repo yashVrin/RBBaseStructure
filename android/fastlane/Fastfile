@@ -1,20 +1,15 @@
 default_platform(:android)
 
 platform :android do
-  desc "Submit a new build to Firebase App Distribution"
-  lane :distribute do
-    gradle(task: "clean assembleRelease")
-    upload_to_firebase
-  end
-
-  desc "Upload existing build to Firebase"
+  desc "Upload existing APK to Firebase App Distribution"
   lane :upload_to_firebase do |options|
-    apk_path = options[:apk_path] || ENV["APK_PATH"] || "app/build/outputs/apk/release/app-release.apk"
-    
-    UI.message("Using APK path: #{apk_path}")
-    UI.message("Absolute APK path: #{File.absolute_path(apk_path)}")
+    # Use absolute APK_PATH from env (set by CI), or fall back to a relative path for local use
+    apk_path = ENV["APK_PATH"] || options[:apk_path] || "app/build/outputs/apk/release/app-release.apk"
+
+    UI.message("Uploading APK from: #{apk_path}")
+
     unless File.exist?(apk_path)
-      UI.user_error!("APK not found at path: #{apk_path}. Ensure the build job succeeded and path is correct.")
+      UI.user_error!("APK not found at: #{apk_path}")
     end
 
     firebase_app_distribution(
@@ -22,7 +17,13 @@ platform :android do
       groups: "testing-group",
       service_credentials_file: ENV["FIREBASE_AUTH_JSON_PATH"] || "../../firebase-auth.json",
       apk_path: apk_path,
-      release_notes: ENV["RELEASE_NOTES"] || "Standard distribution via Fastlane"
+      release_notes: ENV["RELEASE_NOTES"] || "Distribution via Fastlane"
     )
+  end
+
+  desc "Build and distribute in one command (for local use)"
+  lane :distribute do
+    gradle(task: "clean assembleRelease")
+    upload_to_firebase(apk_path: "app/build/outputs/apk/release/app-release.apk")
   end
 end
