@@ -27,8 +27,9 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.3'
-          bundler-cache: true
+          ruby-version: '3.2' # Stable Ruby version
+          # We don't use bundler-cache: true here to avoid the exit code 5 conflict
+          # Instead we run bundle install manually in the next step
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
