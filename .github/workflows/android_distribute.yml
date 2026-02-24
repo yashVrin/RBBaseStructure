@@ -29,10 +29,11 @@ jobs:
         run: npm install
 
       - name: Decode Firebase Service Account Key
-        run: echo "${{ secrets.FIREBASE_DISTRIBUTION_KEY_JSON }}" > firebase-auth.json
+        run: echo "${{ secrets.FIREBASE_DISTRIBUTION_KEY_JSON }}" > ${{ github.workspace }}/firebase-auth.json
 
       - name: Build and Distribute Android
         run: npm run android:distribute
         env:
           FIREBASE_DISTRIBUTION_KEY_JSON: ${{ secrets.FIREBASE_DISTRIBUTION_KEY_JSON }}
+          FIREBASE_AUTH_JSON_PATH: ${{ github.workspace }}/firebase-auth.json
           RELEASE_NOTES: "Automatically distributed from GitHub Actions. Commit: ${{ github.sha }}"

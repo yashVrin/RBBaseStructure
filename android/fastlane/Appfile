@@ -1,2 +1,2 @@
-json_key_file("../../firebase-auth.json") # Path to the service account JSON key file at project root
+json_key_file(ENV["FIREBASE_AUTH_JSON_PATH"] || "../../firebase-auth.json") # Path at root or via absolute ENV var
 package_name("com.rnboilerplate") # Your package name
