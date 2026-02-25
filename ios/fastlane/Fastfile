@@ -192,11 +192,17 @@ platform :ios do
       if latest_log && File.exist?(latest_log)
         UI.message("--- START OF RAW XCODEBUILD LOG (Last 500 lines) ---")
         sh "tail -n 500 '#{latest_log}'"
-        UI.message("--- END OF RAW XCODEBUILD LOG ---")
-        
         UI.message("--- KEY ERROR HIGHLIGHTS ---")
         sh "grep -i 'error:' '#{latest_log}' || echo 'No explicit error lines found'"
         UI.message("--- END OF ERROR HIGHLIGHTS ---")
+        
+        UI.message("--- DEEP AUDIT: BUILD SETTINGS ---")
+        begin
+          sh "xcodebuild -showBuildSettings -workspace RNBoilerplate.xcworkspace -scheme RNBoilerplate -configuration Release"
+        rescue
+          UI.error("Could not fetch build settings for audit.")
+        end
+        UI.message("--- END DEEP AUDIT ---")
       else
         UI.important("Could not find gym log file to dump.")
       end
