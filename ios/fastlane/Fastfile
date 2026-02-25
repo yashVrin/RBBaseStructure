@@ -44,28 +44,35 @@ platform :ios do
     # We stop trying to "fetch" from Apple (which fails because of missing private keys).
     # Instead, we use the Certificate (.p12) and Profile you provide.
     
-    cert_path = "temp_cert.p12"
-    profile_path = "temp_profile.mobileprovision"
+    cert_path = File.expand_path("temp_cert.p12")
+    profile_path = File.expand_path("temp_profile.mobileprovision")
     
     # helper to save base64 to file
-    def save_base64(env_val, path)
+    def save_base64_to_file(env_val, path)
       return false if env_val.nil? || env_val.empty?
-      File.write(path, Base64.decode64(env_val.gsub(/\s+/, "")))
-      true
+      begin
+        decoded = Base64.decode64(env_val.gsub(/\s+/, ""))
+        File.write(path, decoded)
+        UI.message("Saved Base64 content to: #{path} (Size: #{decoded.length})")
+        return File.exist?(path)
+      rescue => e
+        UI.error("Failed to decode or write Base64: #{e.message}")
+        return false
+      end
     end
 
-    if save_base64(ENV["IOS_CERT_P12"], cert_path)
-      UI.message("Importing manual certificate...")
+    if save_base64_to_file(ENV["IOS_CERT_P12"], cert_path)
+      UI.message("Importing manual certificate from #{cert_path}...")
       import_certificate(
         certificate_path: cert_path,
         certificate_password: ENV["IOS_CERT_PASSWORD"],
         keychain_name: "build.keychain"
       )
     else
-      UI.error("IOS_CERT_P12 secret is missing! Build will likely fail.")
+      UI.error("IOS_CERT_P12 secret is missing or could not be written! Build will likely fail.")
     end
 
-    if save_base64(ENV["IOS_PROVISION_PROFILE"], profile_path)
+    if save_base64_to_file(ENV["IOS_PROVISION_PROFILE"], profile_path)
       UI.message("Installing manual provisioning profile...")
       # Fastlane handles .mobileprovision files automatically if they are in the project or matched by name
     else
