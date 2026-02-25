@@ -133,13 +133,14 @@ platform :ios do
       # NEW: Decode and show truths from the profile itself to find the mismatch
       if File.exist?(profile_path)
         UI.message("--- PROMPT: PROFILE DECODED TRUTH ---")
-        sh "security cms -D -i #{profile_path} > decoded_profile.plist"
-        UI.message("Team ID in Profile:")
-        sh "/usr/libexec/PlistBuddy -c 'Print :TeamIdentifier:0' decoded_profile.plist || echo 'Not found'"
-        UI.message("App ID in Profile:")
-        sh "/usr/libexec/PlistBuddy -c 'Print :Entitlements:application-identifier' decoded_profile.plist || echo 'Not found'"
-        UI.message("Profile Name:")
-        sh "/usr/libexec/PlistBuddy -c 'Print :Name' decoded_profile.plist || echo 'Not found'"
+        # Use a more reliable way to decode and print without needing a temp file if possible, 
+        # but temp file is fine if we use the right paths.
+        decoded_path = File.expand_path("decoded_profile.plist")
+        sh "security cms -D -i #{profile_path} > #{decoded_path}"
+        
+        UI.message("Team ID in Profile: " + sh("/usr/libexec/PlistBuddy -c 'Print :TeamIdentifier:0' #{decoded_path}").strip) rescue UI.error("Team ID not found in profile")
+        UI.message("App ID in Profile: " + sh("/usr/libexec/PlistBuddy -c 'Print :Entitlements:application-identifier' #{decoded_path}").strip) rescue UI.error("App ID not found in profile")
+        UI.message("Profile Name: " + sh("/usr/libexec/PlistBuddy -c 'Print :Name' #{decoded_path}").strip) rescue UI.error("Profile Name not found in profile")
         UI.message("--- END DECODED TRUTH ---")
       end
 
@@ -181,7 +182,7 @@ platform :ios do
         silent: false,
         verbose: true,
         include_bitcode: false,
-        export_development_team: team_id,
+        export_team_id: team_id, # FIXED: was export_development_team
         export_options: {
           method: "ad-hoc",
           signingStyle: "manual",
