@@ -3,11 +3,44 @@ default_platform(:ios)
 platform :ios do
   desc "Submit a new build to Firebase App Distribution"
   lane :distribute do
+    def normalize_key_content(content)
+      return nil if content.nil? || content.empty?
+      
+      # 1. Handle literal \n as strings (common in GitHub Secrets)
+      content = content.gsub("\\n", "\n")
+      
+      # 2. Check if it's potentially Base64 encoded
+      if !content.include?("BEGIN PRIVATE KEY") && content.match?(/^[a-zA-Z0-9+\/=\s]+$/)
+        begin
+          require "base64"
+          decoded = Base64.decode64(content)
+          content = decoded if decoded.include?("PRIVATE KEY")
+        rescue
+          # If decoding fails or doesn't look like a key, keep as is
+        end
+      end
+      
+      # 3. Strip any weird whitespace
+      content = content.strip
+      
+      # 4. Fix flattened PEM strings (one line with headers but no internal newlines)
+      header = "-----BEGIN PRIVATE KEY-----"
+      footer = "-----END PRIVATE KEY-----"
+      if content.include?(header) && content.include?(footer)
+        # Extract the middle part and remove ALL whitespace/newlines
+        inner = content.gsub(header, "").gsub(footer, "").gsub(/\s+/, "")
+        # Reconstruct with proper newlines
+        content = "#{header}\n#{inner}\n#{footer}"
+      end
+
+      content
+    end
+
     # Authenticate with Apple Store Connect
     api_key = app_store_connect_api_key(
       key_id: ENV["APP_STORE_CONNECT_API_KEY_ID"],
       issuer_id: ENV["APP_STORE_CONNECT_API_KEY_ISSUER_ID"],
-      key_content: ENV["APP_STORE_CONNECT_API_KEY_CONTENT"].gsub("\\n", "\n"),
+      key_content: normalize_key_content(ENV["APP_STORE_CONNECT_API_KEY_CONTENT"]),
       duration: 1200,
       in_house: false
     )
