@@ -198,7 +198,8 @@ platform :ios do
         
         UI.message("--- DEEP AUDIT: BUILD SETTINGS ---")
         begin
-          sh "xcodebuild -showBuildSettings -workspace RNBoilerplate.xcworkspace -scheme RNBoilerplate -configuration Release"
+          # We use ../ because Fastlane runs from ios/fastlane, we need to go up to ios/
+          sh "xcodebuild -showBuildSettings -workspace ../RNBoilerplate.xcworkspace -scheme RNBoilerplate -configuration Release"
         rescue
           UI.error("Could not fetch build settings for audit.")
         end
