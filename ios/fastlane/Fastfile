@@ -94,16 +94,25 @@ platform :ios do
     end
 
     # 3. Diagnostic: Verify the signing environment
-    UI.message("Checking for valid signing identities in keychain...")
+    UI.message("Check 1: Finding identities in keychain...")
     begin
       sh "security find-identity -v -p codesigning"
-    rescue
-      UI.error("Could not find any signing identities. Check your IOS_CERT_P12 and password.")
+    rescue => e
+      UI.error("Identity search failed: #{e.message}")
     end
 
     # 4. Prepare Xcode for Manual Signing
-    # This disables "Automatically manage signing" in the project file
-    disable_automatic_code_signing(path: "RNBoilerplate.xcodeproj")
+    # We force the Team ID and identity to avoid any guesswork by Xcode
+    team_id = "LF3KD8T45S" # Extracted from pbxproj
+    
+    UI.message("Applying code signing settings for Team: #{team_id}...")
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      path: "RNBoilerplate.xcodeproj",
+      team_id: team_id,
+      bundle_identifier: "com.vrinsoft.RNBoilerplate",
+      code_sign_identity: "Apple Distribution"
+    )
 
     # build_app handles the compilation and export of the IPA
     build_app(
@@ -114,19 +123,19 @@ platform :ios do
       output_directory: "build/ios/ipa",
       output_name: "RNBoilerplate.ipa",
       clean: true,
-      silent: false, # Show full logs for deep debugging
+      silent: false,
       export_options: {
         method: "ad-hoc",
-        compileBitcode: false,
-        uploadBitcode: false,
         signingStyle: "manual",
         provisioningProfiles: {
-          "com.vrinsoft.RNBoilerplate" => profile_name || "AdHoc Provisioning Profile"
+          "com.vrinsoft.RNBoilerplate" => profile_name
         }
       },
-      # Force Xcode to use the correct signing settings
+      # Force Xcode to use the correct signing settings via command line
       xcargs: [
-        "CODE_SIGN_IDENTITY='Apple Distribution'", 
+        "DEVELOPMENT_TEAM=#{team_id}",
+        "CODE_SIGN_STYLE=Manual",
+        "CODE_SIGN_IDENTITY='Apple Distribution'",
         "PROVISIONING_PROFILE_SPECIFIER='#{profile_name}'",
         "AD_HOC_CODE_SIGNING_ALLOWED=YES"
       ].join(" ")
