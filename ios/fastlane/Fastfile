@@ -3,6 +3,7 @@ default_platform(:ios)
 platform :ios do
   desc "Submit a new build to Firebase App Distribution"
   lane :distribute do
+    bundle_id = "com.vrinsoft.rnstructure"
     # 1. Load and Normalize API Key Content
     # We support either raw PEM or Base64 encoded PEM (recommended for CI)
     key_content = ENV["APP_STORE_CONNECT_API_KEY_CONTENT"]
