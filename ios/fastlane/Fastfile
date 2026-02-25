@@ -40,7 +40,8 @@ platform :ios do
       in_house: false
     )
 
-    # Fetch certificates and provisioning profiles
+    # 2. Automated Code Signing
+    # Since slots are free, we can use automated fetching again.
     get_certificates(api_key: api_key)
     get_provisioning_profile(api_key: api_key, ad_hoc: true)
 
