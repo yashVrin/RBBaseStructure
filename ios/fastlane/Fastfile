@@ -40,10 +40,37 @@ platform :ios do
       in_house: false
     )
 
-    # 2. Automated Code Signing
-    # Since slots are free, we can use automated fetching again.
-    get_certificates(api_key: api_key)
-    get_provisioning_profile(api_key: api_key, ad_hoc: true)
+    # 2. Manual Code Signing (The only way that works 100% on CI)
+    # We stop trying to "fetch" from Apple (which fails because of missing private keys).
+    # Instead, we use the Certificate (.p12) and Profile you provide.
+    
+    cert_path = "temp_cert.p12"
+    profile_path = "temp_profile.mobileprovision"
+    
+    # helper to save base64 to file
+    def save_base64(env_val, path)
+      return false if env_val.nil? || env_val.empty?
+      File.write(path, Base64.decode64(env_val.gsub(/\s+/, "")))
+      true
+    end
+
+    if save_base64(ENV["IOS_CERT_P12"], cert_path)
+      UI.message("Importing manual certificate...")
+      import_certificate(
+        certificate_path: cert_path,
+        certificate_password: ENV["IOS_CERT_PASSWORD"],
+        keychain_name: "build.keychain"
+      )
+    else
+      UI.error("IOS_CERT_P12 secret is missing! Build will likely fail.")
+    end
+
+    if save_base64(ENV["IOS_PROVISION_PROFILE"], profile_path)
+      UI.message("Installing manual provisioning profile...")
+      # Fastlane handles .mobileprovision files automatically if they are in the project or matched by name
+    else
+      UI.important("IOS_PROVISION_PROFILE secret is missing.")
+    end
 
     # build_app handles the compilation and export of the IPA
     build_app(
@@ -57,9 +84,16 @@ platform :ios do
       export_options: {
         method: "ad-hoc",
         compileBitcode: false,
-        uploadBitcode: false
+        uploadBitcode: false,
+        provisioningProfiles: {
+          "com.vrinsoft.RNBoilerplate" => ENV["IOS_PROVISION_PROFILE_NAME"] || "AdHoc Provisioning Profile"
+        }
       }
     )
+    
+    # Cleanup
+    File.delete(cert_path) if File.exist?(cert_path)
+    File.delete(profile_path) if File.exist?(profile_path)
     
     upload_to_firebase
   end
