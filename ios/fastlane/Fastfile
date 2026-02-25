@@ -123,12 +123,14 @@ platform :ios do
     # We force the Team ID and identity to avoid any guesswork by Xcode
     team_id = "LF3KD8T45S"
     
+    bundle_id = "com.vrinsoft.rnstructure"
+    
     UI.message("Applying code signing settings for Team: #{team_id} and Identity: #{signing_identity}...")
     update_code_signing_settings(
       use_automatic_signing: false,
       path: "RNBoilerplate.xcodeproj",
       team_id: team_id,
-      bundle_identifier: "com.vrinsoft.RNBoilerplate",
+      bundle_identifier: bundle_id,
       code_sign_identity: signing_identity
     )
 
@@ -148,21 +150,22 @@ platform :ios do
         compileBitcode: false,
         uploadBitcode: false,
         provisioningProfiles: {
-          "com.vrinsoft.RNBoilerplate" => profile_name
+          bundle_id => profile_name
         }
       },
       # Force Xcode to use the correct signing and build settings via command line
+      # Note: We removed PROVISIONING_PROFILE_SPECIFIER from here because it breaks Pods
       xcargs: [
         "DEVELOPMENT_TEAM=#{team_id}",
         "CODE_SIGN_STYLE=Manual",
         "CODE_SIGN_IDENTITY='#{signing_identity}'",
-        "PROVISIONING_PROFILE_SPECIFIER='#{profile_name}'",
         "AD_HOC_CODE_SIGNING_ALLOWED=YES",
         "ENABLE_BITCODE=NO",
         "ARCHS=arm64",
         "ONLY_ACTIVE_ARCH=NO",
         "CODE_SIGNING_REQUIRED=YES",
-        "CODE_SIGNING_ALLOWED=YES"
+        "CODE_SIGNING_ALLOWED=YES",
+        "PRODUCT_BUNDLE_IDENTIFIER=#{bundle_id}" # Force bundle ID override
       ].join(" ")
     )
     
