@@ -72,12 +72,36 @@ platform :ios do
       UI.error("IOS_CERT_P12 secret is missing or could not be written! Build will likely fail.")
     end
 
+    if save_base64_to_file(ENV["IOS_PROVISION_PROFILE"], profile_path)
+      UI.message("Installing manual provisioning profile...")
+      # Ensure the directory exists
+      profile_dir = File.expand_path("~/Library/MobileDevice/Provisioning Profiles")
+      FileUtils.mkdir_p(profile_dir)
+      
+      # Copy to the standard location Xcode expects
+      # We use the UUID if possible, but copying by filename is a starting point
+      # Better: use the filename specified in the project if known, or just a generic one
+      dest_path = File.join(profile_dir, File.basename(profile_path))
+      FileUtils.cp(profile_path, dest_path)
+      UI.message("Provisioning profile installed to #{dest_path}")
+    else
+      UI.important("IOS_PROVISION_PROFILE secret is missing.")
+    end
+
     profile_name = ENV["IOS_PROVISION_PROFILE_NAME"]
     if profile_name.nil? || profile_name.empty?
       UI.error("CRITICAL: IOS_PROVISION_PROFILE_NAME is missing. Build will likely fail.")
     end
 
-    # 3. Prepare Xcode for Manual Signing
+    # 3. Diagnostic: Verify the signing environment
+    UI.message("Checking for valid signing identities in keychain...")
+    begin
+      sh "security find-identity -v -p codesigning"
+    rescue
+      UI.error("Could not find any signing identities. Check your IOS_CERT_P12 and password.")
+    end
+
+    # 4. Prepare Xcode for Manual Signing
     # This disables "Automatically manage signing" in the project file
     disable_automatic_code_signing(path: "RNBoilerplate.xcodeproj")
 
@@ -90,21 +114,28 @@ platform :ios do
       output_directory: "build/ios/ipa",
       output_name: "RNBoilerplate.ipa",
       clean: true,
-      silent: false, # Show more logs if it fails
+      silent: false, # Show full logs for deep debugging
       export_options: {
         method: "ad-hoc",
         compileBitcode: false,
         uploadBitcode: false,
+        signingStyle: "manual",
         provisioningProfiles: {
           "com.vrinsoft.RNBoilerplate" => profile_name || "AdHoc Provisioning Profile"
         }
       },
-      xcargs: "CODE_SIGNING_REQUIRED=YES CODE_SIGNING_ALLOWED=YES" # Force signing settings
+      # Force Xcode to use the correct signing settings
+      xcargs: [
+        "CODE_SIGN_IDENTITY='Apple Distribution'", 
+        "PROVISIONING_PROFILE_SPECIFIER='#{profile_name}'",
+        "AD_HOC_CODE_SIGNING_ALLOWED=YES"
+      ].join(" ")
     )
     
     # Cleanup
     File.delete(cert_path) if File.exist?(cert_path)
     File.delete(profile_path) if File.exist?(profile_path)
+    # Note: We keep the profile in ~/Library for the build to use
     
     upload_to_firebase
   end
