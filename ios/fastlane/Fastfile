@@ -134,37 +134,54 @@ platform :ios do
       code_sign_identity: signing_identity
     )
 
+    # Clear Derived Data to ensure no stale artifacts are causing conflicts
+    clear_derived_data(derived_data_path: "build")
+
     # build_app handles the compilation and export of the IPA
-    build_app(
-      scheme: "RNBoilerplate",
-      workspace: "RNBoilerplate.xcworkspace",
-      configuration: "Release",
-      export_method: "ad-hoc",
-      output_directory: "build/ios/ipa",
-      output_name: "RNBoilerplate.ipa",
-      clean: true,
-      silent: false,
-      export_options: {
-        method: "ad-hoc",
-        signingStyle: "manual",
-        compileBitcode: false,
-        uploadBitcode: false,
-        provisioningProfiles: {
-          bundle_id => profile_name
-        }
-      },
-      # Force Xcode to use the correct signing and build settings via command line
-      # Note: We removed PROVISIONING_PROFILE_SPECIFIER from here because it breaks Pods
-      xcargs: [
-        "DEVELOPMENT_TEAM=#{team_id}",
-        "CODE_SIGN_STYLE=Manual",
-        "CODE_SIGN_IDENTITY='#{signing_identity}'",
-        "AD_HOC_CODE_SIGNING_ALLOWED=YES",
-        "ENABLE_BITCODE=NO",
-        "CODE_SIGNING_REQUIRED=YES",
-        "CODE_SIGNING_ALLOWED=YES",
-      ].join(" ")
-    )
+    begin
+      build_app(
+        scheme: "RNBoilerplate",
+        workspace: "RNBoilerplate.xcworkspace",
+        configuration: "Release",
+        export_method: "ad-hoc",
+        output_directory: "build/ios/ipa",
+        output_name: "RNBoilerplate.ipa",
+        clean: true,
+        silent: false,
+        export_options: {
+          method: "ad-hoc",
+          signingStyle: "manual",
+          compileBitcode: false,
+          uploadBitcode: false,
+          provisioningProfiles: {
+            bundle_id => profile_name
+          }
+        },
+        # Force Xcode to use the correct signing and build settings via command line
+        # Note: We removed PROVISIONING_PROFILE_SPECIFIER from here because it breaks Pods
+        xcargs: [
+          "DEVELOPMENT_TEAM=#{team_id}",
+          "CODE_SIGN_STYLE=Manual",
+          "CODE_SIGN_IDENTITY='#{signing_identity}'",
+          "AD_HOC_CODE_SIGNING_ALLOWED=YES",
+          "ENABLE_BITCODE=NO",
+          "CODE_SIGNING_REQUIRED=YES",
+          "CODE_SIGNING_ALLOWED=YES",
+        ].join(" ")
+      )
+    rescue => e
+      UI.error("CRITICAL: Build failed. Attempting to extract detailed Xcode error...")
+      # Predictable log path for fastlane gym
+      log_file = "/Users/runner/Library/Logs/gym/RNBoilerplate-RNBoilerplate.log"
+      if File.exist?(log_file)
+        UI.message("--- START OF DETAILED LOG TAIL ---")
+        sh "tail -n 100 #{log_file}"
+        UI.message("--- END OF DETAILED LOG TAIL ---")
+      else
+        UI.important("Detailed log not found at #{log_file}")
+      end
+      raise e # Re-raise to ensure the lane fails
+    end
     
     # Cleanup
     File.delete(cert_path) if File.exist?(cert_path)
