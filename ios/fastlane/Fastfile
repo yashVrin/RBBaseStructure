@@ -176,12 +176,8 @@ platform :ios do
             bundle_id => profile_name
           }
         },
-        # Force Xcode to use the correct signing and build settings via command line
+        # Reduced xcargs to avoid overriding CocoaPods and other targets
         xcargs: [
-          "DEVELOPMENT_TEAM=#{team_id}",
-          "CODE_SIGN_STYLE=Manual",
-          "CODE_SIGN_IDENTITY='#{signing_identity}'",
-          "PROVISIONING_PROFILE_SPECIFIER='#{profile_name}'", # Reinforce specifier
           "AD_HOC_CODE_SIGNING_ALLOWED=YES",
           "ENABLE_BITCODE=NO",
           "CODE_SIGNING_REQUIRED=YES",
@@ -189,15 +185,18 @@ platform :ios do
         ].join(" ")
       )
     rescue => e
-      UI.error("CRITICAL: Build failed. Detailed capture starting...")
-      # Look for the last gym log
+      UI.error("CRITICAL: Build failed. Comprehensive log capture starting...")
       log_files = Dir["/Users/runner/Library/Logs/gym/*.log"]
       latest_log = log_files.max_by { |f| File.mtime(f) }
       
       if latest_log && File.exist?(latest_log)
-        UI.message("--- START OF RAW XCODEBUILD LOG (#{latest_log}) ---")
-        sh "tail -n 300 '#{latest_log}'"
+        UI.message("--- START OF RAW XCODEBUILD LOG (Last 500 lines) ---")
+        sh "tail -n 500 '#{latest_log}'"
         UI.message("--- END OF RAW XCODEBUILD LOG ---")
+        
+        UI.message("--- KEY ERROR HIGHLIGHTS ---")
+        sh "grep -i 'error:' '#{latest_log}' || echo 'No explicit error lines found'"
+        UI.message("--- END OF ERROR HIGHLIGHTS ---")
       else
         UI.important("Could not find gym log file to dump.")
       end
