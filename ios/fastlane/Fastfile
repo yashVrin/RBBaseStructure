@@ -72,12 +72,14 @@ platform :ios do
       UI.error("IOS_CERT_P12 secret is missing or could not be written! Build will likely fail.")
     end
 
-    if save_base64_to_file(ENV["IOS_PROVISION_PROFILE"], profile_path)
-      UI.message("Installing manual provisioning profile...")
-      # Fastlane handles .mobileprovision files automatically if they are in the project or matched by name
-    else
-      UI.important("IOS_PROVISION_PROFILE secret is missing.")
+    profile_name = ENV["IOS_PROVISION_PROFILE_NAME"]
+    if profile_name.nil? || profile_name.empty?
+      UI.error("CRITICAL: IOS_PROVISION_PROFILE_NAME is missing. Build will likely fail.")
     end
+
+    # 3. Prepare Xcode for Manual Signing
+    # This disables "Automatically manage signing" in the project file
+    disable_automatic_code_signing(path: "RNBoilerplate.xcodeproj")
 
     # build_app handles the compilation and export of the IPA
     build_app(
@@ -88,14 +90,16 @@ platform :ios do
       output_directory: "build/ios/ipa",
       output_name: "RNBoilerplate.ipa",
       clean: true,
+      silent: false, # Show more logs if it fails
       export_options: {
         method: "ad-hoc",
         compileBitcode: false,
         uploadBitcode: false,
         provisioningProfiles: {
-          "com.vrinsoft.RNBoilerplate" => ENV["IOS_PROVISION_PROFILE_NAME"] || "AdHoc Provisioning Profile"
+          "com.vrinsoft.RNBoilerplate" => profile_name || "AdHoc Provisioning Profile"
         }
-      }
+      },
+      xcargs: "CODE_SIGNING_REQUIRED=YES CODE_SIGNING_ALLOWED=YES" # Force signing settings
     )
     
     # Cleanup
