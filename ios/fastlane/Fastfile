@@ -119,11 +119,27 @@ platform :ios do
       UI.user_error!("Failed to query identities from keychain: #{e.message}")
     end
 
-    # 4. Prepare Xcode for Manual Signing
+    # 4. Global Build Diagnostics (Exhaustive)
+    UI.message("--- GLOBAL DIAGNOSTICS START ---")
+    begin
+      UI.message("Keychain identities:")
+      sh "security find-identity -v -p codesigning build.keychain"
+      
+      profile_dir = File.expand_path("~/Library/MobileDevice/Provisioning Profiles")
+      UI.message("Provisioning profiles in #{profile_dir}:")
+      sh "ls -la '#{profile_dir}'"
+      
+      UI.message("Target Identifier: #{bundle_id}")
+      UI.message("Target Profile Name: #{profile_name}")
+      UI.message("Target Identity: #{signing_identity}")
+    rescue => e
+      UI.error("Diagnostic check failed: #{e.message}")
+    end
+    UI.message("--- GLOBAL DIAGNOSTICS END ---")
+
+    # 5. Prepare Xcode for Manual Signing
     # We force the Team ID and identity to avoid any guesswork by Xcode
     team_id = "LF3KD8T45S"
-    
-    bundle_id = "com.vrinsoft.rnstructure"
     
     UI.message("Applying code signing settings for Team: #{team_id} and Identity: #{signing_identity}...")
     update_code_signing_settings(
@@ -131,7 +147,8 @@ platform :ios do
       path: "RNBoilerplate.xcodeproj",
       team_id: team_id,
       bundle_identifier: bundle_id,
-      code_sign_identity: signing_identity
+      code_sign_identity: signing_identity,
+      profile_name: profile_name # Explicitly reinforce profile name in project
     )
 
     # Clear Derived Data to ensure no stale artifacts are causing conflicts
@@ -148,6 +165,7 @@ platform :ios do
         output_name: "RNBoilerplate.ipa",
         clean: true,
         silent: false,
+        verbose: true, # EXTREMELY IMPORTANT: Full logs in CI
         export_options: {
           method: "ad-hoc",
           signingStyle: "manual",
@@ -158,11 +176,11 @@ platform :ios do
           }
         },
         # Force Xcode to use the correct signing and build settings via command line
-        # Note: We removed PROVISIONING_PROFILE_SPECIFIER from here because it breaks Pods
         xcargs: [
           "DEVELOPMENT_TEAM=#{team_id}",
           "CODE_SIGN_STYLE=Manual",
           "CODE_SIGN_IDENTITY='#{signing_identity}'",
+          "PROVISIONING_PROFILE_SPECIFIER='#{profile_name}'", # Reinforce specifier
           "AD_HOC_CODE_SIGNING_ALLOWED=YES",
           "ENABLE_BITCODE=NO",
           "CODE_SIGNING_REQUIRED=YES",
@@ -170,17 +188,19 @@ platform :ios do
         ].join(" ")
       )
     rescue => e
-      UI.error("CRITICAL: Build failed. Attempting to extract detailed Xcode error...")
-      # Predictable log path for fastlane gym
-      log_file = "/Users/runner/Library/Logs/gym/RNBoilerplate-RNBoilerplate.log"
-      if File.exist?(log_file)
-        UI.message("--- START OF DETAILED LOG TAIL ---")
-        sh "tail -n 100 #{log_file}"
-        UI.message("--- END OF DETAILED LOG TAIL ---")
+      UI.error("CRITICAL: Build failed. Detailed capture starting...")
+      # Look for the last gym log
+      log_files = Dir["/Users/runner/Library/Logs/gym/*.log"]
+      latest_log = log_files.max_by { |f| File.mtime(f) }
+      
+      if latest_log && File.exist?(latest_log)
+        UI.message("--- START OF RAW XCODEBUILD LOG (#{latest_log}) ---")
+        sh "tail -n 300 '#{latest_log}'"
+        UI.message("--- END OF RAW XCODEBUILD LOG ---")
       else
-        UI.important("Detailed log not found at #{log_file}")
+        UI.important("Could not find gym log file to dump.")
       end
-      raise e # Re-raise to ensure the lane fails
+      raise e
     end
     
     # Cleanup
