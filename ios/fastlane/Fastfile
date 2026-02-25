@@ -130,6 +130,19 @@ platform :ios do
       UI.message("Provisioning profiles in #{profile_dir}:")
       sh "ls -la '#{profile_dir}'"
       
+      # NEW: Decode and show truths from the profile itself to find the mismatch
+      if File.exist?(profile_path)
+        UI.message("--- PROMPT: PROFILE DECODED TRUTH ---")
+        sh "security cms -D -i #{profile_path} > decoded_profile.plist"
+        UI.message("Team ID in Profile:")
+        sh "/usr/libexec/PlistBuddy -c 'Print :TeamIdentifier:0' decoded_profile.plist || echo 'Not found'"
+        UI.message("App ID in Profile:")
+        sh "/usr/libexec/PlistBuddy -c 'Print :Entitlements:application-identifier' decoded_profile.plist || echo 'Not found'"
+        UI.message("Profile Name:")
+        sh "/usr/libexec/PlistBuddy -c 'Print :Name' decoded_profile.plist || echo 'Not found'"
+        UI.message("--- END DECODED TRUTH ---")
+      end
+
       UI.message("Target Identifier: #{bundle_id}")
       UI.message("Target Profile Name: #{profile_name}")
       UI.message("Target Identity: #{signing_identity}")
@@ -166,7 +179,9 @@ platform :ios do
         output_name: "RNBoilerplate.ipa",
         clean: true,
         silent: false,
-        verbose: true, # EXTREMELY IMPORTANT: Full logs in CI
+        verbose: true,
+        include_bitcode: false,
+        export_development_team: team_id,
         export_options: {
           method: "ad-hoc",
           signingStyle: "manual",
@@ -176,12 +191,12 @@ platform :ios do
             bundle_id => profile_name
           }
         },
-        # Reduced xcargs to avoid overriding CocoaPods and other targets
         xcargs: [
           "AD_HOC_CODE_SIGNING_ALLOWED=YES",
           "ENABLE_BITCODE=NO",
           "CODE_SIGNING_REQUIRED=YES",
           "CODE_SIGNING_ALLOWED=YES",
+          "CODE_SIGN_STYLE=Manual"
         ].join(" ")
       )
     rescue => e
