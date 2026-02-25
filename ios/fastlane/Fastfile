@@ -194,10 +194,7 @@ platform :ios do
         },
         xcargs: [
           "AD_HOC_CODE_SIGNING_ALLOWED=YES",
-          "ENABLE_BITCODE=NO",
-          "CODE_SIGNING_REQUIRED=YES",
-          "CODE_SIGNING_ALLOWED=YES",
-          "CODE_SIGN_STYLE=Manual"
+          "ENABLE_BITCODE=NO"
         ].join(" ")
       )
     rescue => e
@@ -214,8 +211,9 @@ platform :ios do
         
         UI.message("--- DEEP AUDIT: BUILD SETTINGS ---")
         begin
-          # We use ../ because Fastlane runs from ios/fastlane, we need to go up to ios/
-          sh "xcodebuild -showBuildSettings -workspace ../RNBoilerplate.xcworkspace -scheme RNBoilerplate -configuration Release"
+          # Use absolute path to workspace to be immune to CWD shifts
+          ws_path = File.expand_path("../RNBoilerplate.xcworkspace", __FILE__)
+          sh "xcodebuild -showBuildSettings -workspace #{ws_path} -scheme RNBoilerplate -configuration Release"
         rescue
           UI.error("Could not fetch build settings for audit.")
         end
