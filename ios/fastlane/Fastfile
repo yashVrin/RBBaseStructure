@@ -68,8 +68,17 @@ platform :ios do
         certificate_password: ENV["IOS_CERT_PASSWORD"],
         keychain_name: "build.keychain"
       )
+
+      # IMPORTANT: Allow codesign to access the imported key without a prompt
+      # This is the most common reason for "Error building" in CI
+      begin
+        sh "security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k '' build.keychain"
+        UI.message("Successfully granted codesign access to keychain.")
+      rescue => e
+        UI.error("Failed to set keychain partition list: #{e.message}")
+      end
     else
-      UI.error("IOS_CERT_P12 secret is missing or could not be written! Build will likely fail.")
+      UI.user_error!("IOS_CERT_P12 secret is missing or could not be written! STOPPING.")
     end
 
     if save_base64_to_file(ENV["IOS_PROVISION_PROFILE"], profile_path)
@@ -93,25 +102,34 @@ platform :ios do
       UI.error("CRITICAL: IOS_PROVISION_PROFILE_NAME is missing. Build will likely fail.")
     end
 
-    # 3. Diagnostic: Verify the signing environment
-    UI.message("Check 1: Finding identities in keychain...")
+    # 3. Identity Auto-Detection
+    # We find the exact identity name from the keychain (e.g. "Apple Distribution: ...")
+    signing_identity = ""
     begin
-      sh "security find-identity -v -p codesigning"
+      identities = sh("security find-identity -v -p codesigning build.keychain").split("\n")
+      # Look for a line that looks like: 1) XXXXXX "Apple Distribution: Name (ID)"
+      valid_line = identities.find { |line| line.include?("Apple Distribution") || line.include?("iPhone Distribution") }
+      if valid_line
+        signing_identity = valid_line.match(/"([^"]+)"/)[1]
+        UI.message("Detected Signing Identity: #{signing_identity}")
+      else
+        UI.user_error!("NO VALID DISTRIBUTION IDENTITY FOUND in keychain. Build will fail.")
+      end
     rescue => e
-      UI.error("Identity search failed: #{e.message}")
+      UI.user_error!("Failed to query identities from keychain: #{e.message}")
     end
 
     # 4. Prepare Xcode for Manual Signing
     # We force the Team ID and identity to avoid any guesswork by Xcode
-    team_id = "LF3KD8T45S" # Extracted from pbxproj
+    team_id = "LF3KD8T45S"
     
-    UI.message("Applying code signing settings for Team: #{team_id}...")
+    UI.message("Applying code signing settings for Team: #{team_id} and Identity: #{signing_identity}...")
     update_code_signing_settings(
       use_automatic_signing: false,
       path: "RNBoilerplate.xcodeproj",
       team_id: team_id,
       bundle_identifier: "com.vrinsoft.RNBoilerplate",
-      code_sign_identity: "Apple Distribution"
+      code_sign_identity: signing_identity
     )
 
     # build_app handles the compilation and export of the IPA
@@ -127,22 +145,24 @@ platform :ios do
       export_options: {
         method: "ad-hoc",
         signingStyle: "manual",
-        compileBitcode: false, # Disable Bitcode for stability
+        compileBitcode: false,
         uploadBitcode: false,
         provisioningProfiles: {
           "com.vrinsoft.RNBoilerplate" => profile_name
         }
       },
-      # Force Xcode to use the correct signing and build settings
+      # Force Xcode to use the correct signing and build settings via command line
       xcargs: [
         "DEVELOPMENT_TEAM=#{team_id}",
         "CODE_SIGN_STYLE=Manual",
-        "CODE_SIGN_IDENTITY='Apple Distribution'",
+        "CODE_SIGN_IDENTITY='#{signing_identity}'",
         "PROVISIONING_PROFILE_SPECIFIER='#{profile_name}'",
         "AD_HOC_CODE_SIGNING_ALLOWED=YES",
         "ENABLE_BITCODE=NO",
         "ARCHS=arm64",
-        "ONLY_ACTIVE_ARCH=NO"
+        "ONLY_ACTIVE_ARCH=NO",
+        "CODE_SIGNING_REQUIRED=YES",
+        "CODE_SIGNING_ALLOWED=YES"
       ].join(" ")
     )
     
